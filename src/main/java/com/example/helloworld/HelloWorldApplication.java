@@ -1,5 +1,6 @@
 package com.example.helloworld;
 
+import com.example.helloworld.resources.ChannelsResource;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -23,15 +24,21 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
 
     @Override
     public void run(HelloWorldConfiguration configuration,
-                        Environment environment) {
-          final HelloWorldResource resource = new HelloWorldResource(
-                      configuration.getTemplate(),
-                              configuration.getDefaultName()
-                                  );
-              environment.jersey().register(resource);
-    final TemplateHealthCheck healthCheck =
-            new TemplateHealthCheck(configuration.getTemplate());
+                    Environment environment) {
+
+        final HelloWorldResource resource = new HelloWorldResource(
+                configuration.getTemplate(),
+                configuration.getDefaultName()
+        );
+        environment.jersey().register(resource);
+
+        final TemplateHealthCheck healthCheck =
+                new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
         environment.jersey().register(resource);
+
+        final ChannelsResource channelsResource =
+                new ChannelsResource(configuration.getChannels());
+        environment.jersey().register(channelsResource);
     }
 }
