@@ -2,10 +2,12 @@ package com.example.helloworld;
 
 import com.example.helloworld.resources.ChannelsResource;
 import io.dropwizard.Application;
+import io.dropwizard.client.HttpClientBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.health.TemplateHealthCheck;
+import org.apache.http.client.HttpClient;
 
 public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
     public static void main(String[] args) throws Exception {
@@ -37,8 +39,10 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         environment.healthChecks().register("template", healthCheck);
         environment.jersey().register(resource);
 
+        final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration())
+                .build("xm");
         final ChannelsResource channelsResource =
-                new ChannelsResource(configuration.getChannels());
+                new ChannelsResource(configuration.getChannels(), httpClient);
         environment.jersey().register(channelsResource);
     }
 }

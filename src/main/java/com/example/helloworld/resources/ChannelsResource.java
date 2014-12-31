@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.core.Channels;
 import com.example.helloworld.core.Saying;
 import com.google.common.base.Optional;
+import org.apache.http.client.HttpClient;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,9 +18,11 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ChannelsResource {
     private final String[] channels;
     private final AtomicLong counter;
+    private final HttpClient httpClient;
 
-    public ChannelsResource(String[] channels) {
+    public ChannelsResource(String[] channels, HttpClient httpClient) {
         this.channels = channels;
+        this.httpClient = httpClient;
         this.counter = new AtomicLong();
     }
 

@@ -2,7 +2,11 @@ package com.example.helloworld;
 
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.dropwizard.client.HttpClientConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 public class HelloWorldConfiguration extends Configuration {
     @NotEmpty
@@ -42,5 +46,14 @@ public class HelloWorldConfiguration extends Configuration {
     @JsonProperty
     public void setChannels(String[] channels) {
         this.channels = channels;
+    }
+
+    @Valid
+    @NotNull
+    @JsonProperty
+    private HttpClientConfiguration httpClient = new HttpClientConfiguration();
+
+    public HttpClientConfiguration getHttpClientConfiguration() {
+        return httpClient;
     }
 }
