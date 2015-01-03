@@ -42,7 +42,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration())
                 .build("xm");
         final ChannelsResource channelsResource =
-                new ChannelsResource(configuration.getChannels(), httpClient);
+                new ChannelsResource(httpClient);
         environment.jersey().register(channelsResource);
     }
 }

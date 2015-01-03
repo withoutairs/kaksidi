@@ -1,3 +1,2 @@
 template: Hello, %s!
 defaultName: Stranger
-channels: [leftofcenter, octane, reggaerhythms]
