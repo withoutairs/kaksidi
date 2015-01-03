@@ -3,17 +3,20 @@ package com.example.helloworld.core;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Channels {
     private long id;
 
     @Length(max = 3)
-    private String[] content;
+    private List<String> content;
 
     public Channels() {
         // Jackson deserialization
     }
 
-    public Channels(long id, String[] content) {
+    public Channels(long id, List<String> content) {
         this.id = id;
         this.content = content;
     }
@@ -24,7 +27,7 @@ public class Channels {
     }
 
     @JsonProperty
-    public String[] getContent() {
+    public List<String> getContent() {
         return content;
     }
 }

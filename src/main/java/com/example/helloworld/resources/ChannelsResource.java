@@ -15,6 +15,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,6 +25,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Path("/channels")
@@ -41,7 +45,7 @@ public class ChannelsResource {
     public Channels getChannels() {
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        String[] channels = new String[1];
+        List<String> channelList = new ArrayList<String>();
         try {
             HttpGet request = new HttpGet("https://www.siriusxm.com/userservices/cl/en-us/json/lineup/250/client/ump");
             String responseBody = httpclient.execute(request, new ResponseHandler<String>() {
@@ -55,10 +59,25 @@ public class ChannelsResource {
                     }
                 }
             });
-            channels[0] = "the response was " + responseBody;
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
+            JSONObject jsonObject = new JSONObject(responseBody);
+            JSONObject lineupResponse = jsonObject.getJSONObject("lineup-response");
+            JSONObject lineup = lineupResponse.getJSONObject("lineup");
+            JSONArray categories = lineup.getJSONArray("categories");
+            for (int i = 0; i < categories.length(); i++) {
+                JSONObject category = categories.getJSONObject(i);
+                JSONArray genres = category.getJSONArray("genres");
+                for (int j = 0; j < genres.length(); j++) {
+                    JSONObject genre = genres.getJSONObject(j);
+                    JSONArray channels = genre.getJSONArray("channels");
+                    for (int k = 0; k < channels.length(); k++) {
+                        JSONObject channel = channels.getJSONObject(k);
+                        channelList.add(channel.get("channelKey").toString());
+                    }
+                }
+            }
+            jsonObject.getJSONObject("lineup-response").getJSONObject("lineup").getJSONArray("categories");
         } catch (IOException e) {
+            // TODO increment failure count or something?  and log it.
             e.printStackTrace();
         } finally {
             try {
@@ -67,6 +86,6 @@ public class ChannelsResource {
                 e.printStackTrace();
             }
         }
-        return new Channels(counter.incrementAndGet(), channels);
+        return new Channels(counter.incrementAndGet(), channelList);
     }
 }
