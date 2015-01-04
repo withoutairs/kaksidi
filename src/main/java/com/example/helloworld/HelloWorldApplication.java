@@ -1,6 +1,7 @@
 package com.example.helloworld;
 
 import com.example.helloworld.resources.ChannelsResource;
+import com.example.helloworld.resources.PlayResource;
 import io.dropwizard.Application;
 import io.dropwizard.client.HttpClientBuilder;
 import io.dropwizard.setup.Bootstrap;
@@ -8,8 +9,15 @@ import io.dropwizard.setup.Environment;
 import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.health.TemplateHealthCheck;
 import org.apache.http.client.HttpClient;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.node.Node;
+
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
+
+    public static final String ELASTICSEARCH_CLUSTER_NAME = "cb_air";          // TODO read from config
+
     public static void main(String[] args) throws Exception {
         new HelloWorldApplication().run(args);
     }
@@ -44,5 +52,10 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final ChannelsResource channelsResource =
                 new ChannelsResource(httpClient);
         environment.jersey().register(channelsResource);
+
+        Node node = nodeBuilder().clusterName(ELASTICSEARCH_CLUSTER_NAME).node();
+        final Client elasticSearchClient = node.client();
+        final PlayResource playResource = new PlayResource(elasticSearchClient);
+        environment.jersey().register(playResource);
     }
 }

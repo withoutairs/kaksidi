@@ -27,4 +27,6 @@ pages
 
 housekeeping
 - remove helloworld nature
-- an ES client class instead of httpclient would probably be good
+
+defer
+- the way the webapp connects to the ES cluster feels tightly coupled

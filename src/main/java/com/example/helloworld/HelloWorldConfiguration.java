@@ -3,6 +3,7 @@ package com.example.helloworld;
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.client.HttpClientConfiguration;
+import org.elasticsearch.client.Client;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
