@@ -15,15 +15,16 @@ data collection
 model
 - goal: model as little as possible since this is undocumented API city. or (ick) https://code.google.com/p/pojoxml/
 - things in this app's domain:
--- track
+-- Play ("what's on now" ~SXM timestamp event)
 -- artist
 -- timestamp of sample
 -- timestamp of event start
 -- "raw", that is the full JSON document object we indexed
 
 pages
-- what's playing "now" on each channel (view SXMtimestamp events by channel w/max timestamp)
-- when have we heard this artist before (view SXMtimestamp events by artist)
+- what's playing "now" on each channel (view Play events by channel w/max timestamp)
+- when have we heard this artist before (view Play events by artist)
 
 housekeeping
 - remove helloworld nature
+- an ES client class instead of httpclient would probably be good
