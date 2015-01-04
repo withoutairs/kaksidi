@@ -1,0 +1,29 @@
+data collection
+- bash seems to be working fine for now but is very brittle and only captures 3 channels
+-- discard old data once we trust ES
+-- channel list, https://www.siriusxm.com/userservices/cl/en-us/json/lineup/500/client/ump works too, but 600 doesn't.  smells like an API version number
+-- are we indexing timestamps correctly? are other types OK?
+-- what filters out the channels we don't care about?
+- prob should be thread pool; we want the threads to succeed about every 60 seconds (not *run* every 60)
+-- so the flow should be
+-- fire the pool @ 60 seconds
+-- worker wakes, splays
+-- asks ES "should I work?" (last success > 60s ago?)
+-- if so, work
+
+
+model
+- goal: model as little as possible since this is undocumented API city. or (ick) https://code.google.com/p/pojoxml/
+- things in this app's domain:
+-- track
+-- artist
+-- timestamp of sample
+-- timestamp of event start
+-- "raw", that is the full JSON document object we indexed
+
+pages
+- what's playing "now" on each channel (view SXMtimestamp events by channel w/max timestamp)
+- when have we heard this artist before (view SXMtimestamp events by artist)
+
+housekeeping
+- remove helloworld nature
