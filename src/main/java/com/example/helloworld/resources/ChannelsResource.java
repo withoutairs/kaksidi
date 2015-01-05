@@ -2,12 +2,8 @@ package com.example.helloworld.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.core.Channels;
-import com.example.helloworld.core.Saying;
-import com.google.common.base.Optional;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.RequestLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -21,10 +17,8 @@ import org.json.JSONObject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -75,7 +69,6 @@ public class ChannelsResource {
                     }
                 }
             }
-            jsonObject.getJSONObject("lineup-response").getJSONObject("lineup").getJSONArray("categories");
         } catch (IOException e) {
             // TODO increment failure count or something?  and log it.
             e.printStackTrace();
