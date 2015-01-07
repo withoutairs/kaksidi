@@ -27,6 +27,7 @@ pages
 
 housekeeping
 - remove helloworld nature
+- I suppose it's time for some tests
 
 defer
 - the way the webapp connects to the ES cluster feels tightly coupled

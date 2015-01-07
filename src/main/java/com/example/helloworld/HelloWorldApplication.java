@@ -1,5 +1,6 @@
 package com.example.helloworld;
 
+import com.example.helloworld.resources.ArtistResource;
 import com.example.helloworld.resources.ChannelsResource;
 import com.example.helloworld.resources.PlayResource;
 import io.dropwizard.Application;
@@ -57,5 +58,8 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final Client elasticSearchClient = node.client();
         final PlayResource playResource = new PlayResource(elasticSearchClient);
         environment.jersey().register(playResource);
+
+        final ArtistResource artistResource = new ArtistResource(elasticSearchClient);
+        environment.jersey().register(artistResource);
     }
 }
