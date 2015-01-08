@@ -1,5 +1,6 @@
 package com.example.helloworld.resources;
 
+import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.core.Channels;
 import org.apache.http.HttpEntity;
@@ -13,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,8 +28,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @Path("/channels")
 @Produces(MediaType.APPLICATION_JSON)
 public class ChannelsResource {
+    public static final String SXM_CHANNEL_LIST_URI = "https://www.siriusxm.com/userservices/cl/en-us/json/lineup/250/client/ump";
     private final AtomicLong counter;
     private final HttpClient httpClient;
+    final static Logger logger = (Logger) LoggerFactory.getLogger(ChannelsResource.class); 
+
 
     public ChannelsResource(HttpClient httpClient) {
         this.httpClient = httpClient;
@@ -41,7 +46,7 @@ public class ChannelsResource {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         List<String> channelList = new ArrayList<String>();
         try {
-            HttpGet request = new HttpGet("https://www.siriusxm.com/userservices/cl/en-us/json/lineup/250/client/ump");
+            HttpGet request = new HttpGet(SXM_CHANNEL_LIST_URI);
             String responseBody = httpclient.execute(request, new ResponseHandler<String>() {
                 public String handleResponse(final HttpResponse response) throws IOException {
                     int status = response.getStatusLine().getStatusCode();
@@ -70,7 +75,7 @@ public class ChannelsResource {
                 }
             }
         } catch (IOException e) {
-            // TODO increment failure count or something?  and log it.
+            logger.error("Couldn't get from " + SXM_CHANNEL_LIST_URI, e);
             e.printStackTrace();
         } finally {
             try {

@@ -1,10 +1,12 @@
 package com.example.helloworld.resources;
 
+import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.core.Play;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,6 +25,7 @@ public class PlayResource {
     public static final String ELASTICSEARCH_MAPPING = "timestamp"; // TODO this doesn't belong here
     private final AtomicLong counter;
     private final Client elasticSearchClient;
+    final static Logger logger = (Logger) LoggerFactory.getLogger(PlayResource.class);
 
     public PlayResource(Client elasticSearchClient) {
         this.elasticSearchClient = elasticSearchClient;
@@ -38,11 +41,12 @@ public class PlayResource {
         JSONObject channelMetadataResponse = jsonObject.getJSONObject("channelMetadataResponse");
         JSONObject metaData = channelMetadataResponse.getJSONObject("metaData");
         String channelId = metaData.get("channelId").toString(); // TODO channelKey in the ChannelResource, unsure this is the samme
+        String dateTime = metaData.get("dateTime").toString();
         OffsetDateTime when;
         try {
-            when  = OffsetDateTime.parse(metaData.get("dateTime").toString());
+            when  = OffsetDateTime.parse(dateTime);
         } catch (DateTimeParseException e) {
-            // TODO log it
+            logger.error("Could not parse OffsetDateTime, dateTime=" + dateTime + ", playId = " + id, e);
             when = OffsetDateTime.now();
         }
         JSONObject currentEvent = metaData.getJSONObject("currentEvent");

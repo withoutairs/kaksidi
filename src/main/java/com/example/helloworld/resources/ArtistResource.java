@@ -1,5 +1,6 @@
 package com.example.helloworld.resources;
 
+import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.core.Play;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
@@ -10,6 +11,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,6 +32,7 @@ public class ArtistResource {
     public static final String ELASTICSEARCH_MAPPING = "timestamp"; // TODO this doesn't belong here
     private final AtomicLong counter;
     private final Client elasticSearchClient;
+    final static Logger logger = (Logger) LoggerFactory.getLogger(ArtistResource.class);
 
     public ArtistResource(Client elasticSearchClient) {
         this.elasticSearchClient = elasticSearchClient;
@@ -65,7 +68,7 @@ public class ArtistResource {
                 plays.add(new Play(hit.getId(), artist, songName, when, channelId));
             }
         } catch (Exception e) {
-            // TODO log
+            logger.error("Could not handle getPlays, artist = " + name, e);
             if (plays.isEmpty()) {
                 plays.add(Play.NULL);
             }
