@@ -9,8 +9,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,8 +29,7 @@ public class ChannelsResource {
     public static final String SXM_CHANNEL_LIST_URI = "https://www.siriusxm.com/userservices/cl/en-us/json/lineup/250/client/ump";
     private final AtomicLong counter;
     private final HttpClient httpClient;
-    final static Logger logger = (Logger) LoggerFactory.getLogger(ChannelsResource.class); 
-
+    final static Logger logger = (Logger) LoggerFactory.getLogger(ChannelsResource.class);
 
     public ChannelsResource(HttpClient httpClient) {
         this.httpClient = httpClient;
@@ -43,11 +40,10 @@ public class ChannelsResource {
     @Timed
     public Channels getChannels() {
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
         List<String> channelList = new ArrayList<String>();
         try {
             HttpGet request = new HttpGet(SXM_CHANNEL_LIST_URI);
-            String responseBody = httpclient.execute(request, new ResponseHandler<String>() {
+            String responseBody = httpClient.execute(request, new ResponseHandler<String>() {
                 public String handleResponse(final HttpResponse response) throws IOException {
                     int status = response.getStatusLine().getStatusCode();
                     if (status >= 200 && status < 300) {
@@ -77,12 +73,6 @@ public class ChannelsResource {
         } catch (IOException e) {
             logger.error("Couldn't get from " + SXM_CHANNEL_LIST_URI, e);
             e.printStackTrace();
-        } finally {
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return new Channels(counter.incrementAndGet(), channelList);
     }

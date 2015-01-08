@@ -1,14 +1,14 @@
 package com.example.helloworld;
 
+import com.example.helloworld.health.TemplateHealthCheck;
 import com.example.helloworld.resources.ArtistResource;
 import com.example.helloworld.resources.ChannelsResource;
+import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.resources.PlayResource;
 import io.dropwizard.Application;
 import io.dropwizard.client.HttpClientBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import com.example.helloworld.resources.HelloWorldResource;
-import com.example.helloworld.health.TemplateHealthCheck;
 import org.apache.http.client.HttpClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
