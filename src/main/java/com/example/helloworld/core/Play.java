@@ -2,16 +2,16 @@ package com.example.helloworld.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 public class Play {
     private String id; // straight from ES
     private String artist;
     private String title;
-    private Date when;
+    private OffsetDateTime when;
     private String channelKey;
 
-    public Play(String id, String artist, String title, Date when, String channelKey) {
+    public Play(String id, String artist, String title, OffsetDateTime when, String channelKey) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -33,7 +33,7 @@ public class Play {
     }
 
     @JsonProperty
-    public Date getWhen() {
+    public OffsetDateTime getWhen() {
         return when;
     }
 
@@ -42,5 +42,5 @@ public class Play {
         return channelKey;
     }
 
-    public static Play NULL = new Play("NULL", "Not available", "Not available", new Date(), "Not available");
+    public static Play NULL = new Play("NULL", "Not available", "Not available", OffsetDateTime.now(), "Not available");
 }

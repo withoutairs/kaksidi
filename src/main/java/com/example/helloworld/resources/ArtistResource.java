@@ -16,8 +16,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -57,10 +57,7 @@ public class ArtistResource {
                 JSONObject song = currentEvent.getJSONObject("song");
                 String songName = song.get("name").toString();
 
-                Date when;
-                // TODO this is all busted up, it's an OffsetDateTime ("2015-01-05T06:59:37-05:00"), need to think about how to represent this in a Play
-                // when = new Date(OffsetDateTime.parse(currentEvent.get("dateTime").toString()).toInstant().getEpochSecond());
-                when = new Date();
+                OffsetDateTime when = OffsetDateTime.parse(currentEvent.get("startTime").toString());
 
                 JSONObject artists = currentEvent.getJSONObject("artists");
                 String artist = artists.get("name").toString();
