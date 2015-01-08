@@ -1,9 +1,8 @@
 package com.example.helloworld;
 
-import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.dropwizard.Configuration;
 import io.dropwizard.client.HttpClientConfiguration;
-import org.elasticsearch.client.Client;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
@@ -43,5 +42,20 @@ public class HelloWorldConfiguration extends Configuration {
 
     public HttpClientConfiguration getHttpClientConfiguration() {
         return httpClient;
+    }
+
+    @Valid
+    @NotNull
+    private ElasticSearchClientFactory elasticSearchClient = new ElasticSearchClientFactory();
+
+    @JsonProperty("elasticSearch")
+    public ElasticSearchClientFactory getElasticSearchClientFactory() {
+        return elasticSearchClient;
+    }
+
+
+    @JsonProperty("elasticSearch")
+    public void setElasticSearchClientFactory(ElasticSearchClientFactory elasticSearchClientFactory) {
+        this.elasticSearchClient = elasticSearchClientFactory;
     }
 }

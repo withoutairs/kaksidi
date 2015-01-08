@@ -11,13 +11,8 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.apache.http.client.HttpClient;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.node.Node;
-
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
-
-    public static final String ELASTICSEARCH_CLUSTER_NAME = "cb_air";          // TODO read from config
 
     public static void main(String[] args) throws Exception {
         new HelloWorldApplication().run(args);
@@ -54,8 +49,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
                 new ChannelsResource(httpClient);
         environment.jersey().register(channelsResource);
 
-        Node node = nodeBuilder().clusterName(ELASTICSEARCH_CLUSTER_NAME).node();
-        final Client elasticSearchClient = node.client();
+        final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
         final PlayResource playResource = new PlayResource(elasticSearchClient);
         environment.jersey().register(playResource);
 
