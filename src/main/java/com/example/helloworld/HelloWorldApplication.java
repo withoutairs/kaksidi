@@ -1,5 +1,6 @@
 package com.example.helloworld;
 
+import com.example.helloworld.datacapture.DataCaptureJob;
 import com.example.helloworld.health.TemplateHealthCheck;
 import com.example.helloworld.resources.ArtistResource;
 import com.example.helloworld.resources.ChannelsResource;
@@ -7,10 +8,14 @@ import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.resources.PlayResource;
 import io.dropwizard.Application;
 import io.dropwizard.client.HttpClientBuilder;
+import io.dropwizard.lifecycle.setup.ScheduledExecutorServiceBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.apache.http.client.HttpClient;
 import org.elasticsearch.client.Client;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
 
@@ -55,5 +60,11 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
 
         final ArtistResource artistResource = new ArtistResource(elasticSearchClient);
         environment.jersey().register(artistResource);
+
+        String channel = "leftofcenter";
+        ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
+        ScheduledExecutorService ses = sesBuilder.build();
+        Runnable alarmTask = new DataCaptureJob(channel);
+        ses.scheduleWithFixedDelay(alarmTask, 0, 5, TimeUnit.SECONDS);
     }
 }
