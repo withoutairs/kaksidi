@@ -61,10 +61,11 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final ArtistResource artistResource = new ArtistResource(elasticSearchClient);
         environment.jersey().register(artistResource);
 
+        // TODO dynamically, from a filtered list of channels (or as an interim read from config?)
         String channel = "leftofcenter";
         ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
         ScheduledExecutorService ses = sesBuilder.build();
-        Runnable alarmTask = new DataCaptureJob(channel);
-        ses.scheduleWithFixedDelay(alarmTask, 0, 5, TimeUnit.SECONDS);
+        Runnable alarmTask = new DataCaptureJob(channel, httpClient);
+        ses.scheduleWithFixedDelay(alarmTask, 0, 1, TimeUnit.SECONDS);
     }
 }
