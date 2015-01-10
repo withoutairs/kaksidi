@@ -65,7 +65,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         String channel = "leftofcenter";
         ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
         ScheduledExecutorService ses = sesBuilder.build();
-        Runnable alarmTask = new DataCaptureJob(channel, httpClient);
-        ses.scheduleWithFixedDelay(alarmTask, 0, 1, TimeUnit.SECONDS);
+        Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
+        ses.scheduleWithFixedDelay(alarmTask, 0, 1, TimeUnit.MINUTES); // TODO configure the interval
     }
 }
