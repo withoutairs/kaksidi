@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
  * The call we are making to them contains packets of "channelMetadataResponse", thus this class' name.
  */
 public class ChannelMetadataResponse {
-    private String siriusXmId; // straight from ES
+    private String siriusXmId;
     private String artist;
     private String title;
     private OffsetDateTime when;
