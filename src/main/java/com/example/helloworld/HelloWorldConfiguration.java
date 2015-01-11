@@ -10,7 +10,9 @@ import javax.validation.constraints.NotNull;
 
 public class HelloWorldConfiguration extends Configuration {
     public enum Constants {
-        INDEX_NAME_NAME("com.example.helloworld.indexName");
+        INDEX_NAME_NAME("com.example.helloworld.indexName"),
+        ES_TYPE("channelMetadataResponse");
+
         public final String value;
 
         Constants(String value) {

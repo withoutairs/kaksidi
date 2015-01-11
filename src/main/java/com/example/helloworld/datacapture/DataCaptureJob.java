@@ -58,7 +58,7 @@ public class DataCaptureJob implements Runnable {
             final String code = channelMetadataResponse.getCode();
             if (code.equals("100")) {
                 String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
-                IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, "timestamp").setSource(responseBody).execute().actionGet();
+                IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, HelloWorldConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
                 logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
             } else if (code.equals("305")) {
                 // I suspect the timestamp being out of sync with SXM's expectations causes these

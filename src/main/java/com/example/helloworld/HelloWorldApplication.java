@@ -86,7 +86,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate(indexName);  // TODO this is getting crazy
         final XContentBuilder mappingBuilder;
         try {
-            String documentType = "timestamp";
+            String documentType = HelloWorldConfiguration.Constants.ES_TYPE.value;
             mappingBuilder = jsonBuilder().startObject().
                     startObject(documentType) // this too
                         .startObject("_timestamp").field("enabled", "true").endObject() // TODO this will index timestamps based on now(); do I need to also force time nature on the appropriate fields from plays?

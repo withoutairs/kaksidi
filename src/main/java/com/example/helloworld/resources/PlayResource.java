@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Path("/play")
 @Produces(MediaType.APPLICATION_JSON)
 public class PlayResource {
-    public static final String ELASTICSEARCH_MAPPING = "timestamp"; // TODO this doesn't belong here
     private final AtomicLong counter;
     private final Client elasticSearchClient;
     final static Logger logger = (Logger) LoggerFactory.getLogger(PlayResource.class);
@@ -37,7 +36,7 @@ public class PlayResource {
     public Play getPlay(@PathParam("id") String id) {
         counter.incrementAndGet();
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
-        GetResponse response = elasticSearchClient.prepareGet(indexName, ELASTICSEARCH_MAPPING, id).execute().actionGet();
+        GetResponse response = elasticSearchClient.prepareGet(indexName, HelloWorldConfiguration.Constants.ES_TYPE.value, id).execute().actionGet();
         JSONObject jsonObject = new JSONObject(response.getSource());
         ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
         return new Play(response.getId(), channelMetadataResponse.getArtist(), channelMetadataResponse.getTitle(), channelMetadataResponse.getWhen(), channelMetadataResponse.getChannelKey());

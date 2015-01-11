@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Path("/artist")
 @Produces(MediaType.APPLICATION_JSON)
 public class ArtistResource {
-    public static final String ELASTICSEARCH_MAPPING = "timestamp"; // TODO this doesn't belong here
     private final AtomicLong counter;
     private final Client elasticSearchClient;
     final static Logger logger = (Logger) LoggerFactory.getLogger(ArtistResource.class);
