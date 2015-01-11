@@ -25,12 +25,12 @@ public class ChannelMetadataResponseFactory {
         JSONObject messages = channelMetadataResponse.getJSONObject("messages");
         String code = messages.get("code").toString();
 
-        String dateTime = metaData.get("dateTime").toString();
+        String startTime = currentEvent.get("startTime").toString();
         OffsetDateTime when;
         try {
-            when = OffsetDateTime.parse(dateTime);
+            when = OffsetDateTime.parse(startTime);
         } catch (DateTimeParseException e) {
-            logger.error("Could not parse OffsetDateTime, dateTime=" + dateTime + ", siriusXmId = " + siriusXmId, e);
+            logger.error("Could not parse OffsetDateTime, startTime=" + startTime + ", siriusXmId=" + siriusXmId, e);
             when = OffsetDateTime.now();
         }
 
