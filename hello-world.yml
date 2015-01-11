@@ -3,3 +3,4 @@ defaultName: Stranger
 
 elasticSearch:
   clusterName: cb_air
+  indexName: xm

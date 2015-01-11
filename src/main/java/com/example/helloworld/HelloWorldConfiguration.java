@@ -9,6 +9,16 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class HelloWorldConfiguration extends Configuration {
+    public enum Constants {
+        INDEX_NAME_NAME("com.example.helloworld.indexName");
+        public final String value;
+
+        Constants(String value) {
+            this.value = value;
+        }
+    }
+
+    ;
     @NotEmpty
     private String template;
 

@@ -3,6 +3,7 @@ package com.example.helloworld.resources;
 import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
 import com.example.helloworld.ChannelMetadataResponseFactory;
+import com.example.helloworld.HelloWorldConfiguration;
 import com.example.helloworld.core.ChannelMetadataResponse;
 import com.example.helloworld.core.Play;
 import org.elasticsearch.action.get.GetResponse;
@@ -21,7 +22,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Path("/play")
 @Produces(MediaType.APPLICATION_JSON)
 public class PlayResource {
-    public static final String ELASTICSEARCH_INDEX = "xm"; // TODO this doesn't belong here
     public static final String ELASTICSEARCH_MAPPING = "timestamp"; // TODO this doesn't belong here
     private final AtomicLong counter;
     private final Client elasticSearchClient;
@@ -36,7 +36,8 @@ public class PlayResource {
     @Timed
     public Play getPlay(@PathParam("id") String id) {
         counter.incrementAndGet();
-        GetResponse response = elasticSearchClient.prepareGet(ELASTICSEARCH_INDEX, ELASTICSEARCH_MAPPING, id).execute().actionGet();
+        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        GetResponse response = elasticSearchClient.prepareGet(indexName, ELASTICSEARCH_MAPPING, id).execute().actionGet();
         JSONObject jsonObject = new JSONObject(response.getSource());
         ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
         return new Play(response.getId(), channelMetadataResponse.getArtist(), channelMetadataResponse.getTitle(), channelMetadataResponse.getWhen(), channelMetadataResponse.getChannelKey());

@@ -2,6 +2,7 @@ package com.example.helloworld.resources;
 
 import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
+import com.example.helloworld.HelloWorldConfiguration;
 import com.example.helloworld.core.Play;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.elasticsearch.action.search.SearchResponse;
@@ -28,7 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Path("/artist")
 @Produces(MediaType.APPLICATION_JSON)
 public class ArtistResource {
-    public static final String ELASTICSEARCH_INDEX = "xm"; // TODO this doesn't belong here
     public static final String ELASTICSEARCH_MAPPING = "timestamp"; // TODO this doesn't belong here
     private final AtomicLong counter;
     private final Client elasticSearchClient;
@@ -47,7 +47,8 @@ public class ArtistResource {
         List<Play> plays = new ArrayList<Play>();
         try {
             ISO8601DateFormat df = new ISO8601DateFormat();
-            SearchResponse response = elasticSearchClient.prepareSearch(ELASTICSEARCH_INDEX).setSearchType(SearchType.QUERY_AND_FETCH).setTypes("timestamp").setQuery(QueryBuilders.multiMatchQuery(name, "name")).execute().actionGet(); // TODO "name" is too generic, need to match only the artist name
+            String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+            SearchResponse response = elasticSearchClient.prepareSearch(indexName).setSearchType(SearchType.QUERY_AND_FETCH).setTypes("timestamp").setQuery(QueryBuilders.multiMatchQuery(name, "name")).execute().actionGet(); // TODO "name" is too generic, need to match only the artist name
             SearchHits hits = response.getHits();
             for (Iterator<SearchHit> iterator = hits.iterator(); iterator.hasNext(); ) {
                 SearchHit hit = iterator.next();

@@ -55,15 +55,15 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         environment.healthChecks().register("template", healthCheck);
         environment.jersey().register(resource);
 
-        final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration())
-                .build("xm");
-        final ChannelsResource channelsResource =
-                new ChannelsResource(httpClient);
-        environment.jersey().register(channelsResource);
 
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
 
         addTimestampToIndex(elasticSearchClient);
+
+        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration()).build(indexName);
+        final ChannelsResource channelsResource = new ChannelsResource(httpClient);
+        environment.jersey().register(channelsResource);
 
         final PlayResource playResource = new PlayResource(elasticSearchClient);
         environment.jersey().register(playResource);
@@ -82,7 +82,8 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
     // really, one-time setup but no harm in repeating I suppose
     // TODO does this work?
     private void addTimestampToIndex(Client elasticSearchClient) {
-        final CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate("xm");  // TODO this is getting crazy
+        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        final CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate(indexName);  // TODO this is getting crazy
         final XContentBuilder mappingBuilder;
         try {
             String documentType = "timestamp";
