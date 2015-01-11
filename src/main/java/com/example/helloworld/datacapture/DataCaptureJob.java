@@ -1,6 +1,8 @@
 package com.example.helloworld.datacapture;
 
 import ch.qos.logback.classic.Logger;
+import com.example.helloworld.ChannelMetadataResponseFactory;
+import com.example.helloworld.core.ChannelMetadataResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -51,12 +53,11 @@ public class DataCaptureJob implements Runnable {
             });
 
             JSONObject jsonObject = new JSONObject(responseBody);
-            JSONObject channelMetadataResponse = jsonObject.getJSONObject("channelMetadataResponse");
-            JSONObject messages = channelMetadataResponse.getJSONObject("messages");
-            String code = messages.get("code").toString();
+            ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
+            final String code = channelMetadataResponse.getCode();
             if (code.equals("100")) {
                 IndexResponse indexResponse = elasticSearchClient.prepareIndex("xm", "timestamp").setSource(responseBody).execute().actionGet();
-                logger.info("Successful, added ES_ID=" + indexResponse.getId());
+                logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
             } else if (code.equals("305")) {
                 // I suspect the timestamp being out of sync with SXM's expectations causes these
                 logger.warn("Content unavailable, timestamp=" + timestamp);

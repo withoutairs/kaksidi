@@ -10,10 +10,19 @@ import org.hibernate.validator.constraints.NotEmpty;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 public class ElasticSearchClientFactory {
-@NotEmpty
+    @NotEmpty
     private String clusterName;
-    @JsonProperty String getClusterName() { return clusterName; }
-    @JsonProperty void setClusterName(String clusterName) { this.clusterName = clusterName; }
+
+    @JsonProperty
+    String getClusterName() {
+        return clusterName;
+    }
+
+    @JsonProperty
+    void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
+    }
+
     public Client build(Environment environment) {
         Node node = nodeBuilder().clusterName(clusterName).node();
         final Client client = node.client();

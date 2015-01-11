@@ -1,5 +1,6 @@
 package com.example.helloworld;
 
+import ch.qos.logback.classic.Logger;
 import com.example.helloworld.datacapture.DataCaptureJob;
 import com.example.helloworld.health.TemplateHealthCheck;
 import com.example.helloworld.resources.ArtistResource;
@@ -12,12 +13,18 @@ import io.dropwizard.lifecycle.setup.ScheduledExecutorServiceBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.apache.http.client.HttpClient;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
+    final Logger logger = (Logger) LoggerFactory.getLogger(HelloWorldApplication.class);
 
     public static void main(String[] args) throws Exception {
         new HelloWorldApplication().run(args);
@@ -55,6 +62,9 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         environment.jersey().register(channelsResource);
 
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
+
+        addTimestampToIndex(elasticSearchClient);
+
         final PlayResource playResource = new PlayResource(elasticSearchClient);
         environment.jersey().register(playResource);
 
@@ -67,5 +77,23 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         ScheduledExecutorService ses = sesBuilder.build();
         Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
         ses.scheduleWithFixedDelay(alarmTask, 0, 1, TimeUnit.MINUTES); // TODO configure the interval
+    }
+
+    // really, one-time setup but no harm in repeating I suppose
+    // TODO does this work?
+    private void addTimestampToIndex(Client elasticSearchClient) {
+        final CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate("xm");  // TODO this is getting crazy
+        final XContentBuilder mappingBuilder;
+        try {
+            String documentType = "timestamp";
+            mappingBuilder = jsonBuilder().startObject().
+                    startObject(documentType) // this too
+                        .startObject("_timestamp").field("enabled", "true").endObject() // TODO this will index timestamps based on now(); do I need to also force time nature on the appropriate fields from plays?
+                    .endObject()
+                    .endObject();
+            createIndexRequestBuilder.addMapping(documentType, mappingBuilder);
+        } catch (IOException e) {
+            logger.error("Could not add timestamp to index", e);
+        }
     }
 }
