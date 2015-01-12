@@ -13,7 +13,10 @@ import io.dropwizard.lifecycle.setup.ScheduledExecutorServiceBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.apache.http.client.HttpClient;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
@@ -58,7 +62,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
 
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
 
-        addTimestampToIndex(elasticSearchClient);
+        createIndex(elasticSearchClient);
 
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
         final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration()).build(indexName);
@@ -79,22 +83,26 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         ses.scheduleWithFixedDelay(alarmTask, 0, 1, TimeUnit.MINUTES); // TODO configure the interval
     }
 
-    // really, one-time setup but no harm in repeating I suppose
-    // TODO does this work?
-    private void addTimestampToIndex(Client elasticSearchClient) {
+    private void createIndex(Client elasticSearchClient) {
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
-        final CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate(indexName);  // TODO this is getting crazy
-        final XContentBuilder mappingBuilder;
-        try {
-            String documentType = HelloWorldConfiguration.Constants.ES_TYPE.value;
-            mappingBuilder = jsonBuilder().startObject().
-                    startObject(documentType) // this too
-                        .startObject("_timestamp").field("enabled", "true").endObject() // TODO this will index timestamps based on now(); do I need to also force time nature on the appropriate fields from plays?
-                    .endObject()
-                    .endObject();
-            createIndexRequestBuilder.addMapping(documentType, mappingBuilder);
-        } catch (IOException e) {
-            logger.error("Could not add timestamp to index", e);
+        IndicesExistsResponse indicesExistsResponse = elasticSearchClient.admin().indices().exists(new IndicesExistsRequest(indexName)).actionGet();
+        if (!indicesExistsResponse.isExists()) {
+            final XContentBuilder mappingBuilder;
+            try {
+                String documentType = HelloWorldConfiguration.Constants.ES_TYPE.value;
+                mappingBuilder = jsonBuilder().startObject().
+                        startObject(documentType)
+                        .startObject("_timestamp").field("enabled", "true").field("store", "true").endObject()
+                        .endObject()
+                        .endObject();
+                String json = mappingBuilder.string();
+                CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate(indexName);
+                createIndexRequestBuilder.addMapping(documentType, json);
+                CreateIndexRequest createIndexRequest = createIndexRequestBuilder.request();
+                elasticSearchClient.admin().indices().create(createIndexRequest);
+            } catch (IOException e) {
+                logger.error("Could not add timestamp to index", e);
+            }
         }
     }
 }

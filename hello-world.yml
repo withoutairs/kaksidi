@@ -2,5 +2,5 @@ template: Hello, %s!
 defaultName: Stranger
 
 elasticSearch:
-  clusterName: cb_air
+  clusterName: xm
   indexName: xm
