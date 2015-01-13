@@ -10,7 +10,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.FilteredQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +39,26 @@ public class DataCaptureJob implements Runnable {
     public void run() {
         // TODO splay
         final Logger logger = (Logger) LoggerFactory.getLogger(DataCaptureJob.class + "-" + channel);
+        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+
         try {
+            String INTERVAL = "90"; // TODO mind the configuration
+            FilteredQueryBuilder queryBuilder = QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
+                    FilterBuilders.andFilter(FilterBuilders.termFilter("channelId", channel),
+                            FilterBuilders.rangeFilter("_timestamp").from("now-" + INTERVAL + "s")
+                                    .to("now")
+                                    .includeLower(false)
+                                    .includeUpper(true)));
+            logger.info(queryBuilder.buildAsBytes().toUtf8());
+            SearchResponse searchResponse = elasticSearchClient.prepareSearch(indexName).
+                    setTypes(HelloWorldConfiguration.Constants.ES_TYPE.value).
+                    setQuery(
+                            queryBuilder)
+                    .get();
+            long totalHits = searchResponse.getHits().getTotalHits();
+            logger.info("Found " + totalHits + " in the last " + INTERVAL + " seconds.");
+            if (totalHits > 0) return;
+
             LocalDateTime nowInUtc = LocalDateTime.now(Clock.systemUTC());
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(SXM_TIMESTAMP_PATTERN);
             String timestamp = nowInUtc.format(dateTimeFormatter);
@@ -57,7 +80,6 @@ public class DataCaptureJob implements Runnable {
             ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
             final String code = channelMetadataResponse.getCode();
             if (code.equals("100")) {
-                String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
                 IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, HelloWorldConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
                 logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
             } else if (code.equals("305")) {
@@ -65,6 +87,7 @@ public class DataCaptureJob implements Runnable {
                 logger.warn("Content unavailable, timestamp=" + timestamp);
             } else {
                 logger.warn("Failed, response was " + responseBody);
+
             }
         } catch (Exception e) {
             logger.error("Failed for channel=" + channel, e);
