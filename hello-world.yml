@@ -4,3 +4,8 @@ defaultName: Stranger
 elasticSearch:
   clusterName: xm
   indexName: xm
+
+  # how frequently should we TRY to capture data for a given channel
+  attemptFrequencySeconds: 3
+  # but if we have SUCCEEDED in the previous ... seconds, don't capture data
+  sampleFrequencySeconds: 60

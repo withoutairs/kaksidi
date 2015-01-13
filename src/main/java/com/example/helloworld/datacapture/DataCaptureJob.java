@@ -42,28 +42,27 @@ public class DataCaptureJob implements Runnable {
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
 
         try {
-            String INTERVAL = "90"; // TODO mind the configuration
+            String sampleFrequency = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.SAMPLE_FREQ_NAME.value);
             FilteredQueryBuilder queryBuilder = QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
                     FilterBuilders.andFilter(FilterBuilders.termFilter("channelId", channel),
-                            FilterBuilders.rangeFilter("_timestamp").from("now-" + INTERVAL + "s")
+                            FilterBuilders.rangeFilter("_timestamp").from("now-" + sampleFrequency + "s")
                                     .to("now")
                                     .includeLower(false)
                                     .includeUpper(true)));
-            logger.info(queryBuilder.buildAsBytes().toUtf8());
+            logger.debug(queryBuilder.buildAsBytes().toUtf8());
             SearchResponse searchResponse = elasticSearchClient.prepareSearch(indexName).
                     setTypes(HelloWorldConfiguration.Constants.ES_TYPE.value).
-                    setQuery(
-                            queryBuilder)
+                    setQuery(queryBuilder)
                     .get();
             long totalHits = searchResponse.getHits().getTotalHits();
-            logger.info("Found " + totalHits + " in the last " + INTERVAL + " seconds.");
+            logger.info("Found " + totalHits + " in the last " + sampleFrequency + " seconds.");
             if (totalHits > 0) return;
 
             LocalDateTime nowInUtc = LocalDateTime.now(Clock.systemUTC());
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(SXM_TIMESTAMP_PATTERN);
             String timestamp = nowInUtc.format(dateTimeFormatter);
             final String uri = String.format(sxmTimestampUri, channel, timestamp);
-            logger.info("Calling SXM to capture data from " + uri);
+            logger.debug("Calling SXM to capture data from " + uri);
 
             HttpGet request = new HttpGet(uri);
             String responseBody = httpClient.execute(request, response -> {

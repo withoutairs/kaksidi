@@ -80,7 +80,8 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
         ScheduledExecutorService ses = sesBuilder.build();
         Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
-        ses.scheduleWithFixedDelay(alarmTask, 0, 1, TimeUnit.MINUTES); // TODO configure the interval
+        int attemptFrequencySeconds = Integer.parseInt(elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.ATTEMPT_FREQ_NAME.value));
+        ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
     }
 
     private void createIndex(Client elasticSearchClient) {
