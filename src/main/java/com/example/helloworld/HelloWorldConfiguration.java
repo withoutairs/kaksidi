@@ -30,6 +30,19 @@ public class HelloWorldConfiguration extends Configuration {
     private String defaultName = "Stranger";
 
     @JsonProperty
+    public String[] getChannels() {
+        return channels;
+    }
+
+    @JsonProperty
+    public void setChannels(String[] channels) {
+        this.channels = channels;
+    }
+
+    @NotNull
+    private String[] channels;
+
+    @JsonProperty
     public String getTemplate() {
         return template;
     }

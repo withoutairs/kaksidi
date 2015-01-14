@@ -1,5 +1,16 @@
 template: Hello, %s!
 defaultName: Stranger
+channels:
+  - undergroundgarage
+  - firstwave
+  - leftofcenter
+  - altnation
+  - reggaerhythms
+  - chill
+  - bluegrass
+  - symphonyhall
+  - siriushits1
+  - jamon
 
 elasticSearch:
   clusterName: xm

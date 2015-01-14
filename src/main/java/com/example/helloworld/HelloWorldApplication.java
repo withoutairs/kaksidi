@@ -75,13 +75,15 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final ArtistResource artistResource = new ArtistResource(elasticSearchClient);
         environment.jersey().register(artistResource);
 
-        // TODO dynamically, from a filtered list of channels (or as an interim read from config?)
-        String channel = "leftofcenter";
-        ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
-        ScheduledExecutorService ses = sesBuilder.build();
-        Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
-        int attemptFrequencySeconds = Integer.parseInt(elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.ATTEMPT_FREQ_NAME.value));
-        ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
+        String[] channels = configuration.getChannels(); // TODO pull from ChannelResource
+        for (int i = 0; i < channels.length; i++) {
+            String channel = channels[i];
+            ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
+            ScheduledExecutorService ses = sesBuilder.build();
+            Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
+            int attemptFrequencySeconds = Integer.parseInt(elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.ATTEMPT_FREQ_NAME.value));
+            ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
+        }
     }
 
     private void createIndex(Client elasticSearchClient) {
