@@ -13,7 +13,19 @@ public class ChannelMetadataResponseFactory {
 
     public ChannelMetadataResponse build(JSONObject jsonObject) {
         JSONObject channelMetadataResponse = jsonObject.getJSONObject("channelMetadataResponse");
-        JSONObject metaData = channelMetadataResponse.getJSONObject("metaData");
+        JSONObject messages = channelMetadataResponse.getJSONObject("messages");
+        String code = messages.get("code").toString();
+        if (code.equals("305")) {
+            return ChannelMetadataResponse.NULL;
+        }
+
+        JSONObject metaData;
+        try {
+            metaData = channelMetadataResponse.getJSONObject("metaData");
+        } catch (org.json.JSONException e) {
+            logger.error("No metadata element found in " + jsonObject.toString());
+            return ChannelMetadataResponse.NULL;
+        }
         String channelId = metaData.get("channelId").toString(); // TODO channelKey in the ChannelResource, unsure this is the same
         JSONObject currentEvent = metaData.getJSONObject("currentEvent");
         String siriusXmId = currentEvent.get("siriusXMId").toString();
@@ -21,9 +33,6 @@ public class ChannelMetadataResponseFactory {
         String name = song.get("name").toString();
         JSONObject artists = currentEvent.getJSONObject("artists");
         String artist = artists.get("name").toString();
-
-        JSONObject messages = channelMetadataResponse.getJSONObject("messages");
-        String code = messages.get("code").toString();
 
         String startTime = currentEvent.get("startTime").toString();
         OffsetDateTime when;

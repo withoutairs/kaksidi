@@ -65,5 +65,33 @@ public class ChannelMetadataResponse {
                 ", code='" + code + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChannelMetadataResponse)) return false;
+
+        ChannelMetadataResponse that = (ChannelMetadataResponse) o;
+
+        if (!artist.equals(that.artist)) return false;
+        if (!channelKey.equals(that.channelKey)) return false;
+        if (!code.equals(that.code)) return false;
+        if (!siriusXmId.equals(that.siriusXmId)) return false;
+        if (!title.equals(that.title)) return false;
+        if (!when.equals(that.when)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = siriusXmId.hashCode();
+        result = 31 * result + artist.hashCode();
+        result = 31 * result + title.hashCode();
+        result = 31 * result + when.hashCode();
+        result = 31 * result + channelKey.hashCode();
+        result = 31 * result + code.hashCode();
+        return result;
+    }
 }
 

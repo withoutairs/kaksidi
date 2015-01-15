@@ -21,13 +21,14 @@ import org.slf4j.LoggerFactory;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 public class DataCaptureJob implements Runnable {
     public static final String SXM_TIMESTAMP_PATTERN = "MM-dd'-'kk:mm:'00'";     // TODO the hardcoded 00's are so corny but how does SXM work?
     private final String channel;
     private final HttpClient httpClient;
     private final Client elasticSearchClient;
-    private final String sxmTimestampUri = "https://www.siriusxm.com/metadata/pdt/en-us/json/channels/%s/timestamp/%s";
+    private final String sxmTimestampUri = "https://www.siriusxm.com/metadata/pdt/en-us/json/channels/%s/timestamp/%s?%s";
 
     public DataCaptureJob(String channel, HttpClient httpClient, Client elasticSearchClient) {
         this.channel = channel;
@@ -61,7 +62,8 @@ public class DataCaptureJob implements Runnable {
             LocalDateTime nowInUtc = LocalDateTime.now(Clock.systemUTC());
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(SXM_TIMESTAMP_PATTERN);
             String timestamp = nowInUtc.format(dateTimeFormatter);
-            final String uri = String.format(sxmTimestampUri, channel, timestamp);
+            final int cacheBuster = new Random().nextInt();
+            final String uri = String.format(sxmTimestampUri, channel, timestamp, cacheBuster);
             logger.debug("Calling SXM to capture data from " + uri);
 
             HttpGet request = new HttpGet(uri);
@@ -77,16 +79,17 @@ public class DataCaptureJob implements Runnable {
 
             JSONObject jsonObject = new JSONObject(responseBody);
             ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
+            if (channelMetadataResponse.equals(ChannelMetadataResponse.NULL)) {
+                logger.warn("Content unavailable from " + uri);
+                return;
+            }
+
             final String code = channelMetadataResponse.getCode();
             if (code.equals("100")) {
                 IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, HelloWorldConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
                 logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
-            } else if (code.equals("305")) {
-                // I suspect the timestamp being out of sync with SXM's expectations causes these
-                logger.warn("Content unavailable, timestamp=" + timestamp);
             } else {
                 logger.warn("Failed, response was " + responseBody);
-
             }
         } catch (Exception e) {
             logger.error("Failed for channel=" + channel, e);
