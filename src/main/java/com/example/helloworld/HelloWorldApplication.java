@@ -2,7 +2,6 @@ package com.example.helloworld;
 
 import ch.qos.logback.classic.Logger;
 import com.example.helloworld.datacapture.DataCaptureJob;
-import com.example.helloworld.health.TemplateHealthCheck;
 import com.example.helloworld.resources.ArtistResource;
 import com.example.helloworld.resources.ChannelsResource;
 import com.example.helloworld.resources.HelloWorldResource;
@@ -54,15 +53,13 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         );
         environment.jersey().register(resource);
 
-        final TemplateHealthCheck healthCheck =
-                new TemplateHealthCheck(configuration.getTemplate());
-        environment.healthChecks().register("template", healthCheck);
-        environment.jersey().register(resource);
-
-
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
 
-        createIndex(elasticSearchClient);
+        getOrCreateIndex(elasticSearchClient);
+
+        final DataCaptureHealthCheck dataCaptureHealthCheck = new DataCaptureHealthCheck(elasticSearchClient);
+        environment.healthChecks().register("datacapture", dataCaptureHealthCheck);
+        environment.jersey().register(dataCaptureHealthCheck);
 
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
         final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration()).build(indexName);
@@ -86,7 +83,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         }
     }
 
-    private void createIndex(Client elasticSearchClient) {
+    private void getOrCreateIndex(Client elasticSearchClient) {
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
         IndicesExistsResponse indicesExistsResponse = elasticSearchClient.admin().indices().exists(new IndicesExistsRequest(indexName)).actionGet();
         if (!indicesExistsResponse.isExists()) {
