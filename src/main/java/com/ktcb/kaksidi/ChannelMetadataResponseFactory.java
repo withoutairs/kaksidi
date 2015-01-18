@@ -1,7 +1,7 @@
-package com.example.helloworld;
+package com.ktcb.kaksidi;
 
 import ch.qos.logback.classic.Logger;
-import com.example.helloworld.core.ChannelMetadataResponse;
+import com.ktcb.kaksidi.core.ChannelMetadataResponse;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 

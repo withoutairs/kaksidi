@@ -1,4 +1,4 @@
-package com.example.helloworld;
+package com.ktcb.kaksidi;
 
 import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.health.HealthCheck;
@@ -21,7 +21,7 @@ public class DataCaptureHealthCheck extends HealthCheck {
 
     @Override
     protected Result check() throws Exception {
-        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
         FilteredQueryBuilder queryBuilder = QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
                 FilterBuilders.rangeFilter("_timestamp").from("now-" + unhealthyThresholdSeconds + "s")
                         .to("now")
@@ -29,7 +29,7 @@ public class DataCaptureHealthCheck extends HealthCheck {
                         .includeUpper(true));
         logger.debug(queryBuilder.buildAsBytes().toUtf8());
         SearchResponse searchResponse = elasticSearchClient.prepareSearch(indexName).
-                setTypes(HelloWorldConfiguration.Constants.ES_TYPE.value).
+                setTypes(KaksidiConfiguration.Constants.ES_TYPE.value).
                 setQuery(queryBuilder)
                 .get();
         long totalHits = searchResponse.getHits().getTotalHits();

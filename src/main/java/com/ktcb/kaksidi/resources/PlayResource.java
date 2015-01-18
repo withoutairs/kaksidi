@@ -1,11 +1,11 @@
-package com.example.helloworld.resources;
+package com.ktcb.kaksidi.resources;
 
 import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
-import com.example.helloworld.ChannelMetadataResponseFactory;
-import com.example.helloworld.HelloWorldConfiguration;
-import com.example.helloworld.core.ChannelMetadataResponse;
-import com.example.helloworld.core.Play;
+import com.ktcb.kaksidi.ChannelMetadataResponseFactory;
+import com.ktcb.kaksidi.KaksidiConfiguration;
+import com.ktcb.kaksidi.core.ChannelMetadataResponse;
+import com.ktcb.kaksidi.core.Play;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.json.JSONObject;
@@ -35,8 +35,8 @@ public class PlayResource {
     @Timed
     public Play getPlay(@PathParam("id") String id) {
         counter.incrementAndGet();
-        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
-        GetResponse response = elasticSearchClient.prepareGet(indexName, HelloWorldConfiguration.Constants.ES_TYPE.value, id).execute().actionGet();
+        String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
+        GetResponse response = elasticSearchClient.prepareGet(indexName, KaksidiConfiguration.Constants.ES_TYPE.value, id).execute().actionGet();
         JSONObject jsonObject = new JSONObject(response.getSource());
         ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
         return new Play(response.getId(), channelMetadataResponse.getArtist(), channelMetadataResponse.getTitle(), channelMetadataResponse.getWhen(), channelMetadataResponse.getChannelKey());

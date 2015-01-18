@@ -1,4 +1,4 @@
-package com.example.helloworld.datacapture;
+package com.ktcb.kaksidi.datacapture;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;

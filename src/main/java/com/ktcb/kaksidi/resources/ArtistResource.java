@@ -1,9 +1,9 @@
-package com.example.helloworld.resources;
+package com.ktcb.kaksidi.resources;
 
 import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
-import com.example.helloworld.HelloWorldConfiguration;
-import com.example.helloworld.core.Play;
+import com.ktcb.kaksidi.KaksidiConfiguration;
+import com.ktcb.kaksidi.core.Play;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -46,7 +46,7 @@ public class ArtistResource {
         List<Play> plays = new ArrayList<Play>();
         try {
             ISO8601DateFormat df = new ISO8601DateFormat();
-            String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+            String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
             SearchResponse response = elasticSearchClient.prepareSearch(indexName).setSearchType(SearchType.QUERY_AND_FETCH).setTypes("timestamp").setQuery(QueryBuilders.multiMatchQuery(name, "name")).execute().actionGet(); // TODO "name" is too generic, need to match only the artist name
             SearchHits hits = response.getHits();
             for (Iterator<SearchHit> iterator = hits.iterator(); iterator.hasNext(); ) {

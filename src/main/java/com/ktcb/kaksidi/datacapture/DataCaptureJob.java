@@ -1,9 +1,9 @@
-package com.example.helloworld.datacapture;
+package com.ktcb.kaksidi.datacapture;
 
 import ch.qos.logback.classic.Logger;
-import com.example.helloworld.ChannelMetadataResponseFactory;
-import com.example.helloworld.HelloWorldConfiguration;
-import com.example.helloworld.core.ChannelMetadataResponse;
+import com.ktcb.kaksidi.ChannelMetadataResponseFactory;
+import com.ktcb.kaksidi.KaksidiConfiguration;
+import com.ktcb.kaksidi.core.ChannelMetadataResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -42,7 +42,7 @@ public class DataCaptureJob implements Runnable {
     public void run() {
         // TODO splay
         final Logger logger = (Logger) LoggerFactory.getLogger(DataCaptureJob.class + "-" + channel);
-        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
 
         try {
             int sampleFrequency = dataCaptureJobConfiguration.getSampleFrequencySeconds();
@@ -54,7 +54,7 @@ public class DataCaptureJob implements Runnable {
                                     .includeUpper(true)));
             logger.debug(queryBuilder.buildAsBytes().toUtf8());
             SearchResponse searchResponse = elasticSearchClient.prepareSearch(indexName).
-                    setTypes(HelloWorldConfiguration.Constants.ES_TYPE.value).
+                    setTypes(KaksidiConfiguration.Constants.ES_TYPE.value).
                     setQuery(queryBuilder)
                     .get();
             long totalHits = searchResponse.getHits().getTotalHits();
@@ -88,7 +88,7 @@ public class DataCaptureJob implements Runnable {
 
             final String code = channelMetadataResponse.getCode();
             if (code.equals("100")) {
-                IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, HelloWorldConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
+                IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, KaksidiConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
                 logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
             } else {
                 logger.warn("Failed, response was " + responseBody);

@@ -1,6 +1,6 @@
-package com.example.helloworld;
+package com.ktcb.kaksidi;
 
-import com.example.helloworld.datacapture.DataCaptureJobConfiguration;
+import com.ktcb.kaksidi.datacapture.DataCaptureJobConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.HttpClientConfiguration;
@@ -8,9 +8,9 @@ import io.dropwizard.client.HttpClientConfiguration;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-public class HelloWorldConfiguration extends Configuration {
+public class KaksidiConfiguration extends Configuration {
     public enum Constants {
-        INDEX_NAME_NAME("com.example.helloworld.indexName"),
+        INDEX_NAME_NAME("com.ktcb.kaksidi.indexName"),
         ES_TYPE("channelMetadataResponse");
 
         public final String value;

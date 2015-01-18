@@ -1,4 +1,4 @@
-package com.example.helloworld.core;
+package com.ktcb.kaksidi.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

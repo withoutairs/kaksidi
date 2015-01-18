@@ -1,8 +1,8 @@
-package com.example.helloworld.resources;
+package com.ktcb.kaksidi.resources;
 
 import ch.qos.logback.classic.Logger;
 import com.codahale.metrics.annotation.Timed;
-import com.example.helloworld.core.Channels;
+import com.ktcb.kaksidi.core.Channels;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;

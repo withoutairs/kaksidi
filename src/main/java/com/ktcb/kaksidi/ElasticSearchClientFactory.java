@@ -1,4 +1,4 @@
-package com.example.helloworld;
+package com.ktcb.kaksidi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.lifecycle.Managed;
@@ -41,7 +41,7 @@ public class ElasticSearchClientFactory {
     public Client build(Environment environment) {
         // TOOD yuck.  maybe better to extend Client and make a DataCaptureClient/Factory etc
         Settings settings = ImmutableSettings.settingsBuilder().
-                put(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value, this.getIndexName()).
+                put(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value, this.getIndexName()).
                 build();
         Node node = nodeBuilder().clusterName(clusterName).settings(settings).node();
         final Client client = node.client();

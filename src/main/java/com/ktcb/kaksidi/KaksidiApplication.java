@@ -1,11 +1,11 @@
-package com.example.helloworld;
+package com.ktcb.kaksidi;
 
 import ch.qos.logback.classic.Logger;
-import com.example.helloworld.datacapture.DataCaptureJob;
-import com.example.helloworld.datacapture.DataCaptureJobConfiguration;
-import com.example.helloworld.resources.ArtistResource;
-import com.example.helloworld.resources.ChannelsResource;
-import com.example.helloworld.resources.PlayResource;
+import com.ktcb.kaksidi.datacapture.DataCaptureJob;
+import com.ktcb.kaksidi.datacapture.DataCaptureJobConfiguration;
+import com.ktcb.kaksidi.resources.ArtistResource;
+import com.ktcb.kaksidi.resources.ChannelsResource;
+import com.ktcb.kaksidi.resources.PlayResource;
 import io.dropwizard.Application;
 import io.dropwizard.client.HttpClientBuilder;
 import io.dropwizard.lifecycle.setup.ScheduledExecutorServiceBuilder;
@@ -26,31 +26,31 @@ import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
-    final Logger logger = (Logger) LoggerFactory.getLogger(HelloWorldApplication.class);
+public class KaksidiApplication extends Application<KaksidiConfiguration> {
+    final Logger logger = (Logger) LoggerFactory.getLogger(KaksidiApplication.class);
 
     public static void main(String[] args) throws Exception {
-        new HelloWorldApplication().run(args);
+        new KaksidiApplication().run(args);
     }
 
     @Override
     public String getName() {
-        return "hello-world";
+        return "kaksidi";
     }
 
     @Override
-    public void initialize(Bootstrap<HelloWorldConfiguration> bootstrap) {
+    public void initialize(Bootstrap<KaksidiConfiguration> bootstrap) {
         // nothing to do yet
     }
 
     @Override
-    public void run(HelloWorldConfiguration configuration,
+    public void run(KaksidiConfiguration configuration,
                     Environment environment) {
 
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
         getOrCreateIndex(elasticSearchClient);
 
-        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
         final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration()).build(indexName);
         final ChannelsResource channelsResource = new ChannelsResource(httpClient);
         environment.jersey().register(channelsResource);
@@ -82,12 +82,12 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
     }
 
     private void getOrCreateIndex(Client elasticSearchClient) {
-        String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
+        String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
         IndicesExistsResponse indicesExistsResponse = elasticSearchClient.admin().indices().exists(new IndicesExistsRequest(indexName)).actionGet();
         if (!indicesExistsResponse.isExists()) {
             final XContentBuilder mappingBuilder;
             try {
-                String documentType = HelloWorldConfiguration.Constants.ES_TYPE.value;
+                String documentType = KaksidiConfiguration.Constants.ES_TYPE.value;
                 mappingBuilder = jsonBuilder().startObject().
                         startObject(documentType)
                         .startObject("_timestamp").field("enabled", "true").field("store", "true").endObject()
