@@ -18,22 +18,6 @@ public class ElasticSearchClientFactory {
     @NotEmpty
     private String indexName;
 
-    @NotEmpty
-    private String attemptFrequencySeconds;
-
-    @NotEmpty
-    private String sampleFrequencySeconds;
-
-    @JsonProperty
-    public String getSampleFrequencySeconds() {
-        return sampleFrequencySeconds;
-    }
-
-    @JsonProperty
-    public void setSampleFrequencySeconds(String sampleFrequencySeconds) {
-        this.sampleFrequencySeconds = sampleFrequencySeconds;
-    }
-
     @JsonProperty
     String getClusterName() {
         return clusterName;
@@ -54,22 +38,10 @@ public class ElasticSearchClientFactory {
         this.indexName = indexName;
     }
 
-    @JsonProperty
-    public String getAttemptFrequencySeconds() {
-        return attemptFrequencySeconds;
-    }
-
-    @JsonProperty
-    public void setAttemptFrequencySeconds(String attemptFrequencySeconds) {
-        this.attemptFrequencySeconds = attemptFrequencySeconds;
-    }
-
     public Client build(Environment environment) {
         // TOOD yuck.  maybe better to extend Client and make a DataCaptureClient/Factory etc
         Settings settings = ImmutableSettings.settingsBuilder().
                 put(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value, this.getIndexName()).
-                put(HelloWorldConfiguration.Constants.ATTEMPT_FREQ_NAME.value, this.getAttemptFrequencySeconds()).
-                put(HelloWorldConfiguration.Constants.SAMPLE_FREQ_NAME.value, this.getSampleFrequencySeconds()).
                 build();
         Node node = nodeBuilder().clusterName(clusterName).settings(settings).node();
         final Client client = node.client();

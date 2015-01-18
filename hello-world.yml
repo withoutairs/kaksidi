@@ -14,7 +14,11 @@ elasticSearch:
   clusterName: xm
   indexName: xm
 
+dataCapture:
+  enabled: false
   # how frequently should we TRY to capture data for a given channel
   attemptFrequencySeconds: 3
   # but if we have SUCCEEDED in the previous ... seconds, don't capture data
   sampleFrequencySeconds: 60
+  # after ... seconds with no data captured the job is deemed unhealthy
+  unhealthyThresholdSeconds: 180

@@ -2,6 +2,7 @@ package com.example.helloworld;
 
 import ch.qos.logback.classic.Logger;
 import com.example.helloworld.datacapture.DataCaptureJob;
+import com.example.helloworld.datacapture.DataCaptureJobConfiguration;
 import com.example.helloworld.resources.ArtistResource;
 import com.example.helloworld.resources.ChannelsResource;
 import com.example.helloworld.resources.PlayResource;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -46,12 +48,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
                     Environment environment) {
 
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
-
         getOrCreateIndex(elasticSearchClient);
-
-        final DataCaptureHealthCheck dataCaptureHealthCheck = new DataCaptureHealthCheck(elasticSearchClient);
-        environment.healthChecks().register("datacapture", dataCaptureHealthCheck);
-        environment.jersey().register(dataCaptureHealthCheck);
 
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
         final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration()).build(indexName);
@@ -64,14 +61,23 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         final ArtistResource artistResource = new ArtistResource(elasticSearchClient);
         environment.jersey().register(artistResource);
 
-        String[] channels = configuration.getChannels(); // TODO pull from ChannelResource
-        for (int i = 0; i < channels.length; i++) {
-            String channel = channels[i];
-            ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
-            ScheduledExecutorService ses = sesBuilder.build();
-            Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
-            int attemptFrequencySeconds = Integer.parseInt(elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.ATTEMPT_FREQ_NAME.value));
-//            ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
+        final DataCaptureJobConfiguration dataCaptureJobConfiguration = configuration.getDataCaptureJobConfiguration();
+        if (dataCaptureJobConfiguration.isEnabled()) {
+
+            final int unhealthyThresholdSeconds = dataCaptureJobConfiguration.getUnhealthyThresholdSeconds();
+            final DataCaptureHealthCheck dataCaptureHealthCheck = new DataCaptureHealthCheck(elasticSearchClient, unhealthyThresholdSeconds);
+            environment.healthChecks().register("datacapture", dataCaptureHealthCheck);
+            environment.jersey().register(dataCaptureHealthCheck);
+
+            String[] channels = configuration.getChannels(); // TODO pull from ChannelResource
+            for (int i = 0; i < channels.length; i++) {
+                String channel = channels[i];
+                ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
+                ScheduledExecutorService ses = sesBuilder.build();
+                Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient, dataCaptureJobConfiguration);
+                int attemptFrequencySeconds = dataCaptureJobConfiguration.getAttemptFrequencySeconds();
+                ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
+            }
         }
     }
 

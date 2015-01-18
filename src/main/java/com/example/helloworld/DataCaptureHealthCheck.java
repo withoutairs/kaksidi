@@ -11,19 +11,19 @@ import org.slf4j.LoggerFactory;
 
 public class DataCaptureHealthCheck extends HealthCheck {
     Client elasticSearchClient;
+    int unhealthyThresholdSeconds;
     final Logger logger = (Logger) LoggerFactory.getLogger(DataCaptureHealthCheck.class);
 
-    public DataCaptureHealthCheck(Client elasticSearchClient) {
+    public DataCaptureHealthCheck(Client elasticSearchClient, int unhealthyThresholdSeconds) {
         this.elasticSearchClient = elasticSearchClient;
+        this.unhealthyThresholdSeconds = unhealthyThresholdSeconds;
     }
 
     @Override
     protected Result check() throws Exception {
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
-        String sampleFrequency = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.SAMPLE_FREQ_NAME.value);
-        String lookBack = Integer.toString(Integer.parseInt(sampleFrequency) * 3);
         FilteredQueryBuilder queryBuilder = QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
-                FilterBuilders.rangeFilter("_timestamp").from("now-" + lookBack + "s")
+                FilterBuilders.rangeFilter("_timestamp").from("now-" + unhealthyThresholdSeconds + "s")
                         .to("now")
                         .includeLower(false)
                         .includeUpper(true));
@@ -33,7 +33,7 @@ public class DataCaptureHealthCheck extends HealthCheck {
                 setQuery(queryBuilder)
                 .get();
         long totalHits = searchResponse.getHits().getTotalHits();
-        String blurb = String.format("Sampling every %s seconds, found %s in the last %s seconds.", sampleFrequency, totalHits, lookBack);
+        String blurb = String.format("Found %s in the last %s seconds.", totalHits, unhealthyThresholdSeconds);
         if (totalHits > 0) {
             return Result.healthy(blurb);
         } else {

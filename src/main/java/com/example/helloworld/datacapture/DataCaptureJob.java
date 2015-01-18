@@ -29,11 +29,13 @@ public class DataCaptureJob implements Runnable {
     private final HttpClient httpClient;
     private final Client elasticSearchClient;
     private final String sxmTimestampUri = "https://www.siriusxm.com/metadata/pdt/en-us/json/channels/%s/timestamp/%s?%s";
+    private final DataCaptureJobConfiguration dataCaptureJobConfiguration;
 
-    public DataCaptureJob(String channel, HttpClient httpClient, Client elasticSearchClient) {
+    public DataCaptureJob(String channel, HttpClient httpClient, Client elasticSearchClient, DataCaptureJobConfiguration dataCaptureJobConfiguration) {
         this.channel = channel;
         this.httpClient = httpClient;
         this.elasticSearchClient = elasticSearchClient;
+        this.dataCaptureJobConfiguration = dataCaptureJobConfiguration;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class DataCaptureJob implements Runnable {
         String indexName = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.INDEX_NAME_NAME.value);
 
         try {
-            String sampleFrequency = elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.SAMPLE_FREQ_NAME.value);
+            int sampleFrequency = dataCaptureJobConfiguration.getSampleFrequencySeconds();
             FilteredQueryBuilder queryBuilder = QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(),
                     FilterBuilders.andFilter(FilterBuilders.termFilter("channelId", channel),
                             FilterBuilders.rangeFilter("_timestamp").from("now-" + sampleFrequency + "s")
