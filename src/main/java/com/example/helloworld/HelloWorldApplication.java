@@ -4,7 +4,6 @@ import ch.qos.logback.classic.Logger;
 import com.example.helloworld.datacapture.DataCaptureJob;
 import com.example.helloworld.resources.ArtistResource;
 import com.example.helloworld.resources.ChannelsResource;
-import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.resources.PlayResource;
 import io.dropwizard.Application;
 import io.dropwizard.client.HttpClientBuilder;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -46,12 +44,6 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
     @Override
     public void run(HelloWorldConfiguration configuration,
                     Environment environment) {
-
-        final HelloWorldResource resource = new HelloWorldResource(
-                configuration.getTemplate(),
-                configuration.getDefaultName()
-        );
-        environment.jersey().register(resource);
 
         final Client elasticSearchClient = configuration.getElasticSearchClientFactory().build(environment);
 
@@ -79,7 +71,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
             ScheduledExecutorService ses = sesBuilder.build();
             Runnable alarmTask = new DataCaptureJob(channel, httpClient, elasticSearchClient);
             int attemptFrequencySeconds = Integer.parseInt(elasticSearchClient.settings().get(HelloWorldConfiguration.Constants.ATTEMPT_FREQ_NAME.value));
-            ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
+//            ses.scheduleWithFixedDelay(alarmTask, 0, attemptFrequencySeconds, TimeUnit.SECONDS);
         }
     }
 

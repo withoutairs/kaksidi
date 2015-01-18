@@ -1,5 +1,3 @@
-template: Hello, %s!
-defaultName: Stranger
 channels:
   - undergroundgarage
   - firstwave
