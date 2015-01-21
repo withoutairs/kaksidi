@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class DataCaptureJob implements Runnable {
-    public static final String SXM_TIMESTAMP_PATTERN = "MM-dd'-'kk:mm:'00'";     // TODO the hardcoded 00's are so corny but how does SXM work?
+    public static final String SXM_TIMESTAMP_PATTERN = "MM-dd'-'HH:mm:'00'"; // The hardcoded 00 are corny, but it looks like that's the way SXM likes it
     private final String channel;
     private final HttpClient httpClient;
     private final Client elasticSearchClient;
