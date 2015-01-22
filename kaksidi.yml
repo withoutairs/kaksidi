@@ -15,7 +15,7 @@ elasticSearch:
   indexName: xm
 
 dataCapture:
-  enabled: false
+  enabled: true
   # how frequently should we TRY to capture data for a given channel
   attemptFrequencySeconds: 3
   # but if we have SUCCEEDED in the previous ... seconds, don't capture data

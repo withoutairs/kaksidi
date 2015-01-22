@@ -1,6 +1,7 @@
 package com.ktcb.kaksidi;
 
 import ch.qos.logback.classic.Logger;
+import com.google.common.collect.ImmutableList;
 import com.ktcb.kaksidi.datacapture.DataCaptureJob;
 import com.ktcb.kaksidi.datacapture.DataCaptureJobConfiguration;
 import com.ktcb.kaksidi.resources.ArtistResource;
@@ -11,6 +12,8 @@ import io.dropwizard.client.HttpClientBuilder;
 import io.dropwizard.lifecycle.setup.ScheduledExecutorServiceBuilder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.views.ViewBundle;
+import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import org.apache.http.client.HttpClient;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
@@ -40,7 +43,7 @@ public class KaksidiApplication extends Application<KaksidiConfiguration> {
 
     @Override
     public void initialize(Bootstrap<KaksidiConfiguration> bootstrap) {
-        // nothing to do yet
+        bootstrap.addBundle(new ViewBundle(ImmutableList.of(new FreemarkerViewRenderer())));
     }
 
     @Override
