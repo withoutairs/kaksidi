@@ -37,7 +37,25 @@
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
             <version>1.4.2</version>
-        </dependency>    </dependencies>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.modules</groupId>
+            <artifactId>dropwizard-java8</artifactId>
+            <version>0.7.0-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard.modules</groupId>
+            <artifactId>dropwizard-java8-auth</artifactId>
+            <version>0.7.0-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.dropwizard.modules</groupId>
+            <artifactId>dropwizard-java8-jdbi</artifactId>
+            <version>0.7.0-1</version>
+        </dependency>
+    </dependencies>
 
     <properties>
         <!-- use UTF-8 for everything -->
