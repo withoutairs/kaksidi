@@ -14,6 +14,7 @@ pages
 
 housekeeping
 - I suppose it's time for some tests
+- add an admin page to clear FTL caches -- https://gist.github.com/dmorgantini/11397642 (and get to the config of FreemarkerViewRenderer)
 
 defer
 - the way the webapp connects to the ES cluster feels tightly coupled

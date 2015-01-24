@@ -1,6 +1,7 @@
 package com.ktcb.kaksidi;
 
 import ch.qos.logback.classic.Logger;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableList;
 import com.ktcb.kaksidi.datacapture.DataCaptureJob;
 import com.ktcb.kaksidi.datacapture.DataCaptureJobConfiguration;
@@ -46,6 +47,7 @@ public class KaksidiApplication extends Application<KaksidiConfiguration> {
     public void initialize(Bootstrap<KaksidiConfiguration> bootstrap) {
         bootstrap.addBundle(new Java8Bundle());
         bootstrap.addBundle(new ViewBundle(ImmutableList.of(new FreemarkerViewRenderer())));
+        bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Override
