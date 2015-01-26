@@ -59,7 +59,9 @@ public class KaksidiApplication extends Application<KaksidiConfiguration> {
 
         String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
         final HttpClient httpClient = new HttpClientBuilder(environment).using(configuration.getHttpClientConfiguration()).build(indexName);
-        final ChannelsResource channelsResource = new ChannelsResource(httpClient);
+
+        String[] channels = configuration.getChannels(); // TODO pull from ChannelResource
+        final ChannelsResource channelsResource = new ChannelsResource(httpClient, channels, elasticSearchClient);
         environment.jersey().register(channelsResource);
 
         final PlayResource playResource = new PlayResource(elasticSearchClient);
@@ -76,7 +78,6 @@ public class KaksidiApplication extends Application<KaksidiConfiguration> {
             environment.healthChecks().register("datacapture", dataCaptureHealthCheck);
             environment.jersey().register(dataCaptureHealthCheck);
 
-            String[] channels = configuration.getChannels(); // TODO pull from ChannelResource
             for (int i = 0; i < channels.length; i++) {
                 String channel = channels[i];
                 ScheduledExecutorServiceBuilder sesBuilder = environment.lifecycle().scheduledExecutorService(channel);
