@@ -7,6 +7,7 @@ import com.ktcb.kaksidi.KaksidiConfiguration;
 import com.ktcb.kaksidi.core.ChannelMetadataResponse;
 import com.ktcb.kaksidi.core.Channels;
 import com.ktcb.kaksidi.core.Play;
+import com.ktcb.kaksidi.views.NowPlayingView;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -92,9 +93,10 @@ public class ChannelsResource {
         return new Channels(counter.incrementAndGet(), channelList);
     }
 
-    @GET @Path("now")
+    @GET @Path("now-playing")
+    @Produces(MediaType.TEXT_HTML)
     @Timed
-    public List<Play> getNowPlaying() {
+    public NowPlayingView getNowPlaying() {
         String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
         List<Play> plays = new ArrayList<Play>();
         for (int i = 0; i < channels.length; i++) {
@@ -116,6 +118,6 @@ public class ChannelsResource {
             final Play play = new Play(hit.getId(), channelMetadataResponse.getArtist(), channelMetadataResponse.getTitle(), channelMetadataResponse.getWhen(), channelMetadataResponse.getChannelKey());
             plays.add(play);
         }
-        return plays;
+        return new NowPlayingView(plays);
     }
 }
