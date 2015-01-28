@@ -9,7 +9,7 @@
 <script type="text/jsx">
     React.renderComponent(
             <h1>Hello, world!</h1>,
-            document.getElementById('mount-pointx')
+            document.getElementById('mount-point')
     );
 </script>
 <#--TODO won't need this later of course-->
