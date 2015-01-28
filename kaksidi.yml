@@ -22,3 +22,7 @@ dataCapture:
   sampleFrequencySeconds: 60
   # after ... seconds with no data captured the job is deemed unhealthy
   unhealthyThresholdSeconds: 180
+
+assets:
+  overrides:
+    /assets: src/main/resources/assets/

@@ -1,6 +1,7 @@
 package com.ktcb.kaksidi;
 
 import ch.qos.logback.classic.Logger;
+import com.bazaarvoice.dropwizard.assets.ConfiguredAssetsBundle;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.ImmutableList;
 import com.ktcb.kaksidi.datacapture.DataCaptureJob;
@@ -9,7 +10,6 @@ import com.ktcb.kaksidi.resources.ArtistResource;
 import com.ktcb.kaksidi.resources.ChannelsResource;
 import com.ktcb.kaksidi.resources.PlayResource;
 import io.dropwizard.Application;
-import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.client.HttpClientBuilder;
 import io.dropwizard.java8.Java8Bundle;
 import io.dropwizard.lifecycle.setup.ScheduledExecutorServiceBuilder;
@@ -48,7 +48,7 @@ public class KaksidiApplication extends Application<KaksidiConfiguration> {
     public void initialize(Bootstrap<KaksidiConfiguration> bootstrap) {
         bootstrap.addBundle(new Java8Bundle());
         bootstrap.addBundle(new ViewBundle(ImmutableList.of(new FreemarkerViewRenderer())));
-        bootstrap.addBundle(new AssetsBundle());
+        bootstrap.addBundle(new ConfiguredAssetsBundle("/assets/"));
         bootstrap.getObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
