@@ -6,10 +6,23 @@
 <body>
 <div id="mount-point"></div>
 <script type="text/jsx">
-    React.renderComponent(
-            <h1>Hello there</h1>,
-            document.getElementById('mount-point')
-    );
+    /** @jsx React.DOM */
+    var NowPlaying = React.createClass({
+        getInitialState: function () {
+            return {
+                foo: "bar"
+            }
+        },
+        render: function () {
+            return (
+                    <div className="now-playing">
+                        <h1>Foo: {this.state.foo}</h1>
+                    </div>
+            );
+        }
+    });
+
+    React.render(<NowPlaying/>, document.getElementById('mount-point'));
 </script>
 </body>
 </html>
