@@ -47,7 +47,7 @@ public class ArtistResource {
         try {
             ISO8601DateFormat df = new ISO8601DateFormat();
             String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
-            SearchResponse response = elasticSearchClient.prepareSearch(indexName).setSearchType(SearchType.QUERY_AND_FETCH).setTypes("timestamp").setQuery(QueryBuilders.multiMatchQuery(name, "name")).execute().actionGet(); // TODO "name" is too generic, need to match only the artist name
+            SearchResponse response = elasticSearchClient.prepareSearch(indexName).setSearchType(SearchType.QUERY_AND_FETCH).setTypes(KaksidiConfiguration.Constants.ES_TYPE.value).setQuery(QueryBuilders.multiMatchQuery(name, "name")).execute().actionGet(); // TODO "name" is too generic, need to match only the artist name
             SearchHits hits = response.getHits();
             for (Iterator<SearchHit> iterator = hits.iterator(); iterator.hasNext(); ) {
                 SearchHit hit = iterator.next();
