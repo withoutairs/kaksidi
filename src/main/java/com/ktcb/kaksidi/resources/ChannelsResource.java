@@ -93,10 +93,22 @@ public class ChannelsResource {
         return new Channels(counter.incrementAndGet(), channelList);
     }
 
-    @GET @Path("now-playing")
+    @GET @Path("now-playing-pretty")
     @Produces(MediaType.TEXT_HTML)
     @Timed
-    public NowPlayingView getNowPlaying() {
+    public NowPlayingView getNowPlayingHtmlView() {
+        List<Play> plays = getNowPlayingPlays();
+        return new NowPlayingView(plays);
+    }
+
+    @GET @Path("now-playing")
+    @Timed
+    public List<Play> getNowPlayingJsonView() {
+        List<Play> plays = getNowPlayingPlays();
+        return plays;
+    }
+
+    private List<Play> getNowPlayingPlays() {
         String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
         List<Play> plays = new ArrayList<Play>();
         for (int i = 0; i < channels.length; i++) {
@@ -118,6 +130,6 @@ public class ChannelsResource {
             final Play play = new Play(hit.getId(), channelMetadataResponse.getArtist(), channelMetadataResponse.getTitle(), channelMetadataResponse.getWhen(), channelMetadataResponse.getChannelKey());
             plays.add(play);
         }
-        return new NowPlayingView(plays);
+        return plays;
     }
 }

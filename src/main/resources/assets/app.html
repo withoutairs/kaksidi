@@ -2,27 +2,72 @@
 <head>
     <script src="/assets/react.js"></script>
     <script src="/assets/JSXTransformer.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
 </head>
 <body>
 <div id="mount-point"></div>
 <script type="text/jsx">
     /** @jsx React.DOM */
-    var NowPlaying = React.createClass({
-        getInitialState: function () {
-            return {
-                foo: "bar"
-            }
-        },
+
+    var Play = React.createClass({
         render: function () {
             return (
-                    <div className="now-playing">
-                        <h1>Foo: {this.state.foo}</h1>
+                    <div className="play">
+                        I'm a Play.
+                        <h2 className="title">
+                            {this.props.title}
+                        </h2>
+                        <h2 className="artist">
+                            {this.props.artist}
+                        </h2>
+                        <h2 className="channelKey">
+                            {this.props.channelKey}
+                        </h2>
+                        <h2 className="when">
+                            {this.props.when}
+                        </h2>
                     </div>
             );
         }
     });
 
-    React.render(<NowPlaying/>, document.getElementById('mount-point'));
+
+    var data = [{"id":"AUs6tmKOoqC3LyMD1llM","artist":"Frank Zappa","title":"Catholic Girls","when":"2015-01-30T06:59:18-05:00","channelKey":"undergroundgarage"},{"id":"AUs6tmMsoqC3LyMD1llO","artist":"Classix Nouveaux","title":"Guilty","when":"2015-01-30T06:59:41-05:00","channelKey":"firstwave"},{"id":"AUs6tYaMoqC3LyMD1llJ","artist":"alt-J","title":"Nara","when":"2015-01-30T06:54:42-05:00","channelKey":"leftofcenter"},{"id":"AUs6tmKLoqC3LyMD1llK","artist":"Yelawolf","title":"Til It's Gone","when":"2015-01-30T06:56:03-05:00","channelKey":"altnation"},{"id":"AUs6tJTUoqC3LyMD1llF","artist":"Johnny Osbourne","title":"Jah Promise","when":"2015-01-30T06:56:56-05:00","channelKey":"reggaerhythms"},{"id":"AUs6tmQRoqC3LyMD1llQ","artist":"Seinabo Sey/Kygo","title":"Younger Remix","when":"2015-01-30T06:54:32-05:00","channelKey":"chill"},{"id":"AUs6tJUxoqC3LyMD1llG","artist":"Del McCoury Band","title":"White Pass Railroad","when":"2015-01-30T06:54:39-05:00","channelKey":"bluegrass"},{"id":"AUs6tmKOoqC3LyMD1llL","artist":"Edvard Grieg","title":"Violin Sonata No. 3","when":"2015-01-30T06:40:54-05:00","channelKey":"symphonyhall"},{"id":"AUs6tmPsoqC3LyMD1llP","artist":"Taylor Swift","title":"Blank Space","when":"2015-01-30T06:57:30-05:00","channelKey":"siriushits1"},{"id":"AUs6tmK1oqC3LyMD1llN","artist":"Umphrey's McGee","title":"No Diablo","when":"2015-01-30T06:58:27-05:00","channelKey":"jamon"}];
+
+    var NowPlaying = React.createClass({
+        getInitialState: function () {
+            return {
+                data: []
+            };
+
+        },
+        componentDidMount: function () {
+            $.ajax({
+                url: this.props.url,
+                dataType: 'json',
+                success: function(data) {
+                    this.setState({data: data});
+                }.bind(this),
+                error: function(xhr, status, err) {
+                    console.error(this.props.url, status, err.toString());
+                }.bind(this)
+            })
+        },
+        render: function () {
+            var playNodes = this.state.data.map(function (play) {
+                return (
+                        <Play title={play.title} artist={play.artist} channelKey={play.channelKey} when={play.when}></Play>
+                );
+            });
+
+            return (
+            <div className="now-playing">
+                    {playNodes}
+            </div>
+            );
+        }
+    });
+    React.render(<NowPlaying data={data} url="../channels/now-playing"/>, document.getElementById('mount-point'));
 </script>
 </body>
 </html>
