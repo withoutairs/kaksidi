@@ -13,7 +13,6 @@
         render: function () {
             return (
                     <div className="play">
-                        I'm a Play.
                         <h2 className="title">
                             {this.props.title}
                         </h2>
@@ -41,7 +40,7 @@
             };
 
         },
-        componentDidMount: function () {
+        loadPlays: function () {
             $.ajax({
                 url: this.props.url,
                 dataType: 'json',
@@ -53,10 +52,14 @@
                 }.bind(this)
             })
         },
+        componentDidMount: function () {
+            this.loadPlays();
+            setInterval(this.loadPlays, this.props.interval)
+        },
         render: function () {
             var playNodes = this.state.data.map(function (play) {
                 return (
-                        <Play title={play.title} artist={play.artist} channelKey={play.channelKey} when={play.when}></Play>
+                        <Play key={play.id} title={play.title} artist={play.artist} channelKey={play.channelKey} when={play.when}></Play>
                 );
             });
 
@@ -67,7 +70,7 @@
             );
         }
     });
-    React.render(<NowPlaying data={data} url="../channels/now-playing"/>, document.getElementById('mount-point'));
+    React.render(<NowPlaying data={data} url="../channels/now-playing" interval={30000}/>, document.getElementById('mount-point'));
 </script>
 </body>
 </html>
