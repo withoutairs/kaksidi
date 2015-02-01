@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class DataCaptureJob implements Runnable {
@@ -30,12 +32,15 @@ public class DataCaptureJob implements Runnable {
     private final Client elasticSearchClient;
     private final String sxmTimestampUri = "https://www.siriusxm.com/metadata/pdt/en-us/json/channels/%s/timestamp/%s?%s";
     private final DataCaptureJobConfiguration dataCaptureJobConfiguration;
+    private final List<StorageStrategy> storageStrategies;
 
     public DataCaptureJob(String channel, HttpClient httpClient, Client elasticSearchClient, DataCaptureJobConfiguration dataCaptureJobConfiguration) {
         this.channel = channel;
         this.httpClient = httpClient;
         this.elasticSearchClient = elasticSearchClient;
         this.dataCaptureJobConfiguration = dataCaptureJobConfiguration;
+        this.storageStrategies = new ArrayList<StorageStrategy>();
+        this.storageStrategies.add(new DiskStorageStrategy());
     }
 
     @Override
@@ -79,19 +84,25 @@ public class DataCaptureJob implements Runnable {
                 }
             });
 
-            JSONObject jsonObject = new JSONObject(responseBody);
-            ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
-            if (channelMetadataResponse.equals(ChannelMetadataResponse.NULL)) {
-                logger.warn("Content unavailable from " + uri);
-                return;
-            }
+            storageStrategies.forEach((strategy) -> {
+                strategy.apply(responseBody);
+            });
 
-            final String code = channelMetadataResponse.getCode();
-            if (code.equals("100")) {
-                IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, KaksidiConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
-                logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
-            } else {
-                logger.warn("Failed, response was " + responseBody);
+            { // TODO make this strategy pattern too
+                JSONObject jsonObject = new JSONObject(responseBody);
+                ChannelMetadataResponse channelMetadataResponse = new ChannelMetadataResponseFactory().build(jsonObject);
+                if (channelMetadataResponse.equals(ChannelMetadataResponse.NULL)) {
+                    logger.warn("Content unavailable from " + uri);
+                    return;
+                }
+
+                final String code = channelMetadataResponse.getCode();
+                if (code.equals("100")) {
+                    IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, KaksidiConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
+                    logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
+                } else {
+                    logger.warn("Failed, response was " + responseBody);
+                }
             }
         } catch (Exception e) {
             logger.error("Failed for channel=" + channel, e);
