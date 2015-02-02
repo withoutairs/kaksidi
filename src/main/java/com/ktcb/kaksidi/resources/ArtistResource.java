@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -47,7 +48,11 @@ public class ArtistResource {
         try {
             ISO8601DateFormat df = new ISO8601DateFormat();
             String indexName = elasticSearchClient.settings().get(KaksidiConfiguration.Constants.INDEX_NAME_NAME.value);
-            SearchResponse response = elasticSearchClient.prepareSearch(indexName).setSearchType(SearchType.QUERY_AND_FETCH).setTypes(KaksidiConfiguration.Constants.ES_TYPE.value).setQuery(QueryBuilders.multiMatchQuery(name, "name")).execute().actionGet(); // TODO "name" is too generic, need to match only the artist name
+            SearchResponse response = elasticSearchClient.prepareSearch(indexName).
+                    setSearchType(SearchType.QUERY_AND_FETCH)
+                    .setTypes(KaksidiConfiguration.Constants.ES_TYPE.value)
+                    .setQuery(QueryBuilders.filteredQuery(QueryBuilders.matchAllQuery(), FilterBuilders.termFilter("channelMetadataResponse.metaData.currentEvent.artists.name", name)))
+                    .execute().actionGet();
             SearchHits hits = response.getHits();
             for (Iterator<SearchHit> iterator = hits.iterator(); iterator.hasNext(); ) {
                 SearchHit hit = iterator.next();

@@ -101,9 +101,24 @@ public class KaksidiApplication extends Application<KaksidiConfiguration> {
                 mappingBuilder = jsonBuilder().startObject().
                         startObject(documentType)
                         .startObject("_timestamp").field("enabled", "true").field("store", "true").endObject()
+                        .startObject("channelMetadataResponse")
+                        .startObject("metaData")
+                        .startObject("currentEvent")
+                        .startObject("artists")
+                        .startObject("name").field("type", "string").field("index","analyzed")
+                        .startObject("fields")
+                        .startObject("raw").field("type", "string").field("index","not_analyzed")
+                        .endObject()
+                        .endObject()
+                        .endObject()
+                        .endObject()
+                        .endObject()
+                        .endObject()
+                        .endObject()
                         .endObject()
                         .endObject();
                 String json = mappingBuilder.string();
+                logger.info(json);
                 CreateIndexRequestBuilder createIndexRequestBuilder = elasticSearchClient.admin().indices().prepareCreate(indexName);
                 createIndexRequestBuilder.addMapping(documentType, json);
                 CreateIndexRequest createIndexRequest = createIndexRequestBuilder.request();
