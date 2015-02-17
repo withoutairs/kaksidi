@@ -1,0 +1,130 @@
+{
+  "channelMetadataResponse": {
+    "metaData": {
+      "version": 1.1,
+      "dateTime": "2015-02-15T11:59:01.220-05:00",
+      "currentEvent": {
+        "startTime": "2015-02-15T11:54:28-05:00",
+        "song": {
+          "name": "Sweet Nasty",
+          "id": "$O11jz",
+          "creativeArts": [
+            {
+              "url": "Live/Default/DefaultMDS_t_29.jpg",
+              "type": "IMAGE",
+              "size": "THUMBNAIL",
+              "encrypted": false
+            },
+            {
+              "url": "Live/Default/DefaultMDS_s_29.jpg",
+              "type": "IMAGE",
+              "size": "SMALL",
+              "encrypted": false
+            },
+            {
+              "url": "Live/Default/DefaultMDS_m_29.jpg",
+              "type": "IMAGE",
+              "size": "MEDIUM",
+              "encrypted": false
+            },
+            {
+              "url": "",
+              "type": "IMAGE",
+              "size": "LARGE",
+              "encrypted": false
+            },
+            {
+              "url": "",
+              "type": "BIO",
+              "encrypted": false
+            },
+            {
+              "url": "",
+              "type": "REVIEWS",
+              "encrypted": false
+            },
+            {
+              "url": "NY_Assets_1/Default_Content/5_DefaultMDS_t_29.jpg",
+              "type": "IMAGE",
+              "size": "THUMBNAIL",
+              "encrypted": true
+            },
+            {
+              "url": "NY_Assets_1/Default_Content/5_DefaultMDS_s_29.jpg",
+              "type": "IMAGE",
+              "size": "SMALL",
+              "encrypted": true
+            },
+            {
+              "url": "NY_Assets_1/Default_Content/5_DefaultMDS_m_29.jpg",
+              "type": "IMAGE",
+              "size": "MEDIUM",
+              "encrypted": true
+            },
+            {
+              "url": "",
+              "type": "IMAGE",
+              "size": "LARGE",
+              "encrypted": true
+            },
+            {
+              "url": "",
+              "type": "BIO",
+              "encrypted": true
+            },
+            {
+              "url": "",
+              "type": "REVIEWS",
+              "encrypted": true
+            }
+          ],
+          "composer": "",
+          "album": {
+            "name": "Sweet Nasty"
+          }
+        },
+        "siriusXMId": 230235453,
+        "keyValue": "12345678901234567890123456789012",
+        "keyIndex": 5,
+        "epgInfo": {
+          "segment": {
+            "startTime": "2015-02-15T04:00:00-05:00",
+            "segmentId": 2450992,
+            "duration": 10800,
+            "description": "Jam On host Nick Masi is an avid (and often opinionated) music commentator who also hosts the Brooklyn Vegan radio show on Sirius XMU, and Cover Me on EStreet Radio."
+          },
+          "program": {
+            "title": "Jam On with Nick Masi",
+            "startTime": "2015-02-15T04:00:00-05:00",
+            "showId": 5329,
+            "live": false,
+            "firstRun": false,
+            "episodes": {
+              "title": "Jam On with Nick Masi",
+              "startTime": "2015-02-15T04:00:00-05:00",
+              "showId": 5329,
+              "firstRun": false,
+              "episodeId": 2450992,
+              "duration": 10800,
+              "description": "Jam On host Nick Masi is an avid (and often opinionated) music commentator who also hosts the Brooklyn Vegan radio show on Sirius XMU, and Cover Me on EStreet Radio."
+            },
+            "description": "Jam On host Nick Masi is an avid (and often opinionated) music commentator who also hosts the Brooklyn Vegan radio show on Sirius XMU, and Cover Me on EStreet Radio."
+          }
+        },
+        "baseUrl": "http://www.siriusxm.com/albumart/",
+        "artists": {
+          "name": "Earphunk",
+          "id": "C#0"
+        }
+      },
+      "channelNumber": 29,
+      "channelName": "Jam_ON",
+      "channelId": "jamon"
+    },
+    "status": 1,
+    "messages": {
+      "message": "Successful request",
+      "code": 100
+    }
+  }
+}
