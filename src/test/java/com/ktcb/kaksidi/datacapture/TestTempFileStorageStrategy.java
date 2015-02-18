@@ -1,3 +1,5 @@
+package com.ktcb.kaksidi.datacapture;
+
 import com.ktcb.kaksidi.datacapture.TempFileStorageStrategy;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;

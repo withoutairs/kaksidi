@@ -1,8 +1,8 @@
 package com.ktcb.kaksidi;
 
-import ch.qos.logback.classic.Logger;
 import com.ktcb.kaksidi.core.ChannelMetadataResponse;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;

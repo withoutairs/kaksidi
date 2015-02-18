@@ -1,10 +1,10 @@
 package com.ktcb.kaksidi.datacapture;
 
-import ch.qos.logback.classic.Logger;
 import com.ktcb.kaksidi.ChannelMetadataResponseFactory;
 import com.ktcb.kaksidi.core.ChannelMetadataResponse;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
@@ -30,6 +30,8 @@ public class ZipStorageStrategy implements StorageStrategy {
             zipOutputStream.putNextEntry(zipEntry);
             zipOutputStream.write(responseBody.getBytes());
             zipOutputStream.closeEntry();
+            zipOutputStream.flush();
+            zipOutputStream.close();
             fileOutputStream.close();
             logger.info("Added " + filename + " to " + name);
 
