@@ -2,6 +2,8 @@ import com.ktcb.kaksidi.datacapture.TempFileStorageStrategy;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.org.lidalia.slf4jtest.TestLogger;
+import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +24,9 @@ public class TestTempFileStorageStrategy {
             String body = FileUtils.readFileToString(file);
             TempFileStorageStrategy strategy = new TempFileStorageStrategy();
             strategy.apply(body);
+            TestLogger logger = TestLoggerFactory.getTestLogger(TempFileStorageStrategy.class);
+            Assert.assertEquals(1, logger.getLoggingEvents().size());
+            Assert.assertTrue(logger.getLoggingEvents().get(0).getMessage().startsWith("Saved to"));
         } catch (URISyntaxException e) {
             Assert.fail("Spacetime failure, hardcoded text failed");
         } catch (IOException e) {
