@@ -22,6 +22,8 @@ dataCapture:
   sampleFrequencySeconds: 60
   # after ... seconds with no data captured the job is deemed unhealthy
   unhealthyThresholdSeconds: 180
+  # store ZIPs with raw data here: optional
+  zipStorageDirectory: /Users/cbrown/Documents/kaksidi/
 
 assets:
   overrides:

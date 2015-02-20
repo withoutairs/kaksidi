@@ -40,6 +40,8 @@ public class DataCaptureJob implements Runnable {
         this.elasticSearchClient = elasticSearchClient;
         this.dataCaptureJobConfiguration = dataCaptureJobConfiguration;
         this.storageStrategies = new ArrayList<StorageStrategy>();
+        final ZipStorageStrategy zipStorageStrategy = new ZipStorageStrategy(dataCaptureJobConfiguration.getZipStorageDirectory());
+        this.storageStrategies.add(zipStorageStrategy); // TODO config?
         this.storageStrategies.add(new TempFileStorageStrategy()); // TODO config?
     }
 
@@ -94,11 +96,8 @@ public class DataCaptureJob implements Runnable {
 
                 final String code = channelMetadataResponse.getCode();
                 if (code.equals("100")) {
-                    storageStrategies.forEach((strategy) -> {
-                        strategy.apply(responseBody);
-                    });
+                    storageStrategies.forEach((strategy) -> strategy.apply(responseBody));
 
-                    // TODO make this strategy pattern too, but against the channelMetadataResponse? modeling is off here
                     IndexResponse indexResponse = elasticSearchClient.prepareIndex(indexName, KaksidiConfiguration.Constants.ES_TYPE.value).setSource(responseBody).execute().actionGet();
                     logger.info("Successful, added ES_ID=" + indexResponse.getId() + " from " + channelMetadataResponse + " should be at http://localhost:9200/" + indexResponse.getIndex() + "/" + indexResponse.getType() + "/" + indexResponse.getId());
                 } else {

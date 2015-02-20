@@ -12,9 +12,20 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Save the incoming String, which must parse to a channelMetadataResponse, to an appropriate ZIP.
+ *
+ * We are not passing in a channelMetadataResponse here because the point is to capture the straight-from-SXM data,
+ * and the channelMetadataResponse may vary over time.
+ */
 public class ZipStorageStrategy implements StorageStrategy {
     final Logger logger = (Logger) LoggerFactory.getLogger(ZipStorageStrategy.class);
-    final String storagePath = "/tmp/kaksidi/"; // TODO config obvs
+    final String storagePath;
+
+    public ZipStorageStrategy(String storagePath) {
+        this.storagePath = storagePath;
+    }
+
     public void apply(String responseBody)  {
         try
         {
@@ -34,7 +45,6 @@ public class ZipStorageStrategy implements StorageStrategy {
             zipOutputStream.close();
             fileOutputStream.close();
             logger.info("Added " + filename + " to " + name);
-
         } catch (IOException e) {
             e.printStackTrace();
         }

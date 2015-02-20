@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Save the incoming String (presumably a response) to a temp file.
+ *
+ * Meant for debugging, it is unlikely to be used in production.
+ */
 public class TempFileStorageStrategy implements StorageStrategy {
     final Logger logger = (Logger) LoggerFactory.getLogger(TempFileStorageStrategy.class);
     public void apply(String responseBody)  {

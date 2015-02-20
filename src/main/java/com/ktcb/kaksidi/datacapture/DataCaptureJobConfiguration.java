@@ -14,6 +14,7 @@ public class DataCaptureJobConfiguration extends Configuration {
     private int sampleFrequencySeconds;
     @NotEmpty
     private int unhealthyThresholdSeconds;
+    private String zipStorageDirectory;
 
     @JsonProperty
     public int getUnhealthyThresholdSeconds() {
@@ -55,4 +56,13 @@ public class DataCaptureJobConfiguration extends Configuration {
         this.attemptFrequencySeconds = attemptFrequencySeconds;
     }
 
+    @JsonProperty
+    public String getZipStorageDirectory() {
+        return zipStorageDirectory;
+    }
+
+    @JsonProperty
+    public void setZipStorageDirectory(String zipStorageDirectory) {
+        this.zipStorageDirectory = zipStorageDirectory;
+    }
 }

@@ -1,6 +1,5 @@
 package com.ktcb.kaksidi.datacapture;
 
-import com.ktcb.kaksidi.datacapture.TempFileStorageStrategy;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import java.nio.file.Paths;
 
 public class TestTempFileStorageStrategy {
     @Test
-    public void test1() {
+    public void RawResponseSavesToTempFile() {
 
         URL resourceUrl = getClass().getResource("/sample-channelMetadataResponse.json");
         Path resourcePath = null;
