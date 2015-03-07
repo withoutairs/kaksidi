@@ -17,7 +17,7 @@ public class TestTempFileStorageStrategy {
     @Test
     public void RawResponseSavesToTempFile() {
 
-        URL resourceUrl = getClass().getResource("/sample-channelMetadataResponse.json");
+        URL resourceUrl = getClass().getResource("/sample-channelMetadataResponse-1.json");
         Path resourcePath = null;
         try {
             resourcePath = Paths.get(resourceUrl.toURI());

@@ -21,7 +21,7 @@ public class TestZipStorageStrategy {
     public void RawResponseSavesToZip() {
         final Logger logger = (Logger) LoggerFactory.getLogger(TestZipStorageStrategy.class);
 
-        URL resourceUrl = getClass().getResource("/sample-channelMetadataResponse.json");
+        URL resourceUrl = getClass().getResource("/sample-channelMetadataResponse-1.json");
         Path resourcePath = null;
         try {
             resourcePath = Paths.get(resourceUrl.toURI());
@@ -47,4 +47,47 @@ public class TestZipStorageStrategy {
         }
 
     }
+
+    @Test
+    public void MultipleSavesToZip() {
+        final Logger logger = (Logger) LoggerFactory.getLogger(TestZipStorageStrategy.class);
+
+        URL resourceUrl1 = getClass().getResource("/sample-channelMetadataResponse-1.json");
+        URL resourceUrl2 = getClass().getResource("/sample-channelMetadataResponse-2.json");
+        Path resourcePath = null;
+        try {
+            File tempDirectoryForZip = Files.createTempDir();
+            ZipStorageStrategy strategy = new ZipStorageStrategy(tempDirectoryForZip.getAbsolutePath() + File.separator);
+
+            resourcePath = Paths.get(resourceUrl1.toURI());
+            File file = resourcePath.toFile();
+            String body = FileUtils.readFileToString(file);
+            strategy.apply(body);
+
+            resourcePath = Paths.get(resourceUrl2.toURI());
+            file = resourcePath.toFile();
+            body = FileUtils.readFileToString(file);
+            strategy.apply(body);
+
+            // There should be a ZIP file
+            final File[] files = tempDirectoryForZip.listFiles();
+            if (Arrays.isNullOrEmpty(files)) {
+                Assert.fail("No zips found in " + tempDirectoryForZip);
+            }
+            Assert.assertEquals(1, files.length);
+
+            // It should have two files in it
+            ZipFile zipFile = new ZipFile(files[0]);
+            Assert.assertEquals(2, zipFile.size());
+
+            zipFile.close();
+        } catch (URISyntaxException e) {
+            logger.error("test failed", e);
+            Assert.fail("Spacetime failure, hardcoded text failed to parse");
+        } catch (IOException e) {
+            logger.error("test failed", e);
+            Assert.fail("Come on, couldn't read a file from disk");
+        }
+    }
+
 }
